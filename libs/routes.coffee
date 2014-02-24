@@ -30,11 +30,15 @@ setup = (app, controllers) ->
       else 
         val.response().send val.result
 
-  serveResource(router('get','/api/project'), controllers.findAllProjects)
-  serveResource(router('post','/api/project'), controllers.createProject)
-  serveResource(router('put','/api/project/:id'), controllers.updateProject)
-  serveResource(router('delete','/api/project/:id'), controllers.removeProject)
-  serveResource(router('get','/api/project/:id'), controllers.findProject)
+  serveResource(router('get','/api/project'), controllers.project.findAllProjects)
+  serveResource(router('post','/api/project'), controllers.project.createProject)
+  serveResource(router('put','/api/project/:id'), controllers.project.updateProject)
+  serveResource(router('delete','/api/project/:id'), controllers.project.removeProject)
+  serveResource(router('get','/api/project/:id'), controllers.project.findProject)
+
+  serveResource(router('post','/api/project/:project/build'), controllers.build.createBuild)
+  serveResource(router('get','/api/project/:project/build'), controllers.build.findAllBuilds)
+  serveResource(router('get','/api/project/:project/build/:number'), controllers.build.findBuild)
 
 
 exports.setup = setup

@@ -3,9 +3,28 @@
   "name": "testproject",
   "_id": "project-testproject",
   "displayName": "Test Project"
-},{
+},
+{
   "type": "project",
   "name": "myproject",
   "_id": "project-myproject",
   "displayName": "My Project"
+},
+{
+  "_id": "testproject-build-1",
+  "type": "build",
+  "project": "testproject",
+  "buildNumber": 1,
+  "status": "created",
+  "start": "2014-02-24T11:09:11.222Z",
+  "tests": []
+},
+{
+  "_id": "testproject-build-2",
+  "type": "build",
+  "project": "testproject",
+  "buildNumber": 2,
+  "status": "created",
+  "start": "2014-02-24T11:11:11.222Z",
+  "tests": []
 }]

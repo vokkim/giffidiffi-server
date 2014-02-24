@@ -52,6 +52,12 @@ describe 'API', ->
             res.body.displayName.should.equal('POST Test Project')
             done()
 
+      it 'POST returns 409 conflict if ID already exists', (done) ->   
+          data = { name: "testp", displayName: "Conflicting Project" }
+          request(url).post('/api/project').send(data).end (err, res) ->
+            res.status.should.equal(409)
+            done()
+
       it 'PUT updates project, but not the id/name', (done) ->   
           data = { name: "modifiedname", displayName: "Modified Test Project", _id: "ignoredid" }
           request(url).put('/api/project/testp').send(data).end (err, res) ->
@@ -72,6 +78,42 @@ describe 'API', ->
             res.status.should.equal(404)
             done()
 
+  describe 'Build', ->
+
+    it 'GET project/testproject/build returns all builds for testproject', (done) ->   
+      request(url).get('/api/project/testproject/build').end (err, res) ->
+        res.status.should.equal(200)
+        res.body.length.should.equal(2)
+        _.each res.body, (build)->
+          build.type.should.equal("build")
+          build.project.should.equal("testproject")
+        done()
+
+    it 'GET project/testproject/build/:id returns matching projects', (done) ->   
+      request(url).get('/api/project/testproject/build/2').expect('Content-Type', /json/).end (err, res) -> 
+        res.status.should.equal(200)
+        res.body.project.should.equal("testproject")
+        res.body.buildNumber.should.equal(2)
+        done()
+
+    it 'GET project/testproject/build/:id with unknown ID returns 404', (done) ->   
+      request(url).get('/api/project/testproject/build/45').end (err, res) ->
+        res.status.should.equal(404)
+        done()  
+
+    describe 'CRUD operations', ()->
+      before (done) ->
+        request(url).post('/api/project/testproject/build').end (err, res) -> 
+          done()
+
+      it 'POST creates new Build with incrementing Build ID', (done) ->   
+          request(url).get('/api/project/testproject/build/3').end (err, res) ->
+            res.status.should.equal(200)
+            res.body.project.should.equal('testproject')
+            res.body.status.should.equal('created')
+            res.body.buildNumber.should.equal(3)
+            res.body.tests.should.be.empty
+            done()
 
 clearDatabase = (db) ->
   (done) ->
