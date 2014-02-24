@@ -1,5 +1,8 @@
+fs = require('fs')
+Buffer = require('buffer').Buffer;
 server = require('../server')
 fixtures = require('./fixtures.json')
+attachments = require('./attachments.json')
 Bacon = require('baconjs')
 assert = require('assert')
 PouchDB = require('PouchDB')
@@ -18,6 +21,7 @@ describe 'API', ->
   this.timeout 5000
   before (done) -> clearDatabase(db)(done)
   before (done) -> setFixtures(db)(done)
+  before (done) -> setTestAttachments(db)(done)
 
   describe 'Project', ->
       
@@ -125,6 +129,12 @@ describe 'API', ->
           build.type.should.equal("test")
         done()
 
+     it 'get image for test', (done) ->   
+      request(url).get('/api/project/testproject/build/2/tests/first_test/image').expect('Content-Type', /png/).end (err, res) ->
+        res.status.should.equal(200)
+        done()
+
+
     describe 'Creating tests', ()->
 
       it 'POST creates new set of tests', (done) ->   
@@ -154,3 +164,14 @@ clearDatabase = (db) ->
 setFixtures = (db) ->
   (done) ->
     Bacon.fromNodeCallback(db.bulkDocs, {docs: fixtures}).onValue () -> done()
+
+setTestAttachments = (db) ->
+  (done) ->
+    streams = _.map attachments, (attachment) ->
+      Bacon.fromNodeCallback(fs.readFile, attachment.file).flatMap (data)->
+        Bacon.fromNodeCallback(db.get, attachment.testId).flatMap (doc) ->
+          Bacon.fromNodeCallback(db.putAttachment, doc._id, doc.testName, doc._rev, data, "image/png")
+    Bacon.combineAsArray(streams).onValue ()-> done()
+
+
+    

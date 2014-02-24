@@ -1,0 +1,16 @@
+[{
+  "file": "./test/1_first_test.png",
+  "testId": "testproject-build-1-test-first_test"
+},
+{
+  "file": "./test/2_first_test.png",
+  "testId": "testproject-build-2-test-first_test"
+},
+{
+  "file": "./test/second_test.png",
+  "testId": "testproject-build-1-test-second_test"
+},
+{
+  "file": "./test/second_test.png",
+  "testId": "testproject-build-2-test-second_test"
+}]

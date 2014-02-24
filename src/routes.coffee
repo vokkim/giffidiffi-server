@@ -30,6 +30,18 @@ setup = (app, controllers) ->
       else 
         val.response().send val.result
 
+  serveFile = (requestStream, controller) ->
+    requestStream.flatMap (val) ->
+      controller(val.request()).map (result) ->
+        { response: val.response, result: result }
+      .mapError (e) ->
+        { error: e, response: val.response }
+    .onValue (val) ->
+      if val.error
+        val.response().send val.error.status
+      else 
+        val.response().type(val.result.contentType).send(val.result.data)
+
   serveResource(router('get','/api/project'), controllers.project.findAllProjects)
   serveResource(router('post','/api/project'), controllers.project.createProject)
   serveResource(router('put','/api/project/:id'), controllers.project.updateProject)
@@ -42,6 +54,7 @@ setup = (app, controllers) ->
 
   serveResource(router('post','/api/project/:project/build/:number/tests'), controllers.tests.createTests)
   serveResource(router('get','/api/project/:project/build/:number/tests'), controllers.tests.findTests)
+  serveFile(router('get','/api/project/:project/build/:number/tests/:test/image'), controllers.tests.findTestOriginalImage)
 
 
 exports.setup = setup

@@ -38,9 +38,19 @@ module.exports = (db) ->
       Bacon.fromNodeCallback(db.bulkDocs, {docs: docs})  
     .map (result) ->
       docs
-      
+
+  findTestOriginalImage = (request) ->
+    projectName = request.params.project
+    buildNumber = parseInt(request.params.number)
+    testName = request.params.test
+    Bacon.fromNodeCallback(db.get, projectName+"-build-"+buildNumber+"-test-"+testName).flatMap (res) ->
+      Bacon.combineTemplate { 
+        data: Bacon.fromNodeCallback(db.getAttachment, res._id, testName)
+        contentType: res._attachments[testName].content_type
+      }
 
   api =
     createTests: createTests
     findTests: findTests
+    findTestOriginalImage: findTestOriginalImage
 
