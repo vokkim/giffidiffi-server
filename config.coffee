@@ -1,3 +1,3 @@
 module.exports = {
-  dbname: "./db/giffidiffi-production"
+  dbname: "./db/giffidiffi-test"
 }

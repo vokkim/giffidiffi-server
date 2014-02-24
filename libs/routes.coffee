@@ -12,6 +12,7 @@ setup = (app, controllers) ->
       when "get" then app.get(path, cb)
       when "post" then app.post(path, cb)
       when "put" then app.put(path, cb)
+      when "delete" then app.del(path, cb)
       else
         throw new Error "Unrecognized method: "+method
     bus
@@ -31,6 +32,8 @@ setup = (app, controllers) ->
 
   serveResource(router('get','/api/project'), controllers.findAllProjects)
   serveResource(router('post','/api/project'), controllers.createProject)
+  serveResource(router('put','/api/project/:id'), controllers.updateProject)
+  serveResource(router('delete','/api/project/:id'), controllers.removeProject)
   serveResource(router('get','/api/project/:id'), controllers.findProject)
 
 

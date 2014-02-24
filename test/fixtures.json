@@ -1,11 +1,11 @@
 [{
   "type": "project",
-  "_id": "project-1",
   "name": "testproject",
+  "_id": "project-testproject",
   "displayName": "Test Project"
 },{
   "type": "project",
-  "_id": "project-2",
   "name": "myproject",
+  "_id": "project-myproject",
   "displayName": "My Project"
 }]
