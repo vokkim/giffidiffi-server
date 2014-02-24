@@ -1,8 +1,8 @@
 express = require("express")
 PouchDB = require('PouchDB')
 
-controllers = require("./libs/controllers")
-routes = require("./libs/routes")
+controllers = require("./src/controllers")
+routes = require("./src/routes")
 
 initExpressApplication = () ->
   application = express()
