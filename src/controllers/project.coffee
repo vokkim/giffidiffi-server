@@ -4,13 +4,9 @@ _ = require("lodash")
 
 module.exports = (db) ->
 
-  getProject = (name) ->
-    Bacon.fromNodeCallback(db.get, "project-"+name)
 
-  getAllDocuments = (ruleF) ->
-    Bacon.fromNodeCallback(db.query, {map: ruleF}).map (res) ->
-      _.pluck(res.rows, 'value')
-      
+  helpers = require("./helpers")(db)
+
   createProject = (request) ->
     if _.isEmpty(request.body.displayName)
       return Bacon.Error "Must provide displayName"
@@ -29,18 +25,18 @@ module.exports = (db) ->
       project
 
   updateProject = (request) ->
-    getProject(request.params.id).flatMap (res) ->
+    helpers.getProject(request.params.id).flatMap (res) ->
       project = _.merge(res, {displayName: request.body.displayName})
       Bacon.fromNodeCallback(db.put, project).map (res) ->
         project
 
   removeProject = (request) ->
-    getProject(request.params.id).flatMap (res) ->
+    helpers.getProject(request.params.id).flatMap (res) ->
       Bacon.fromNodeCallback(db.remove, res).map (res) ->
         true
 
   findProject = (request) ->
-    getProject(request.params.id).map (res) ->
+    helpers.getProject(request.params.id).map (res) ->
       _.omit(res, ['_rev', '_id'])
 
   findAllProjects = () ->
@@ -48,7 +44,7 @@ module.exports = (db) ->
       if doc.type == "project"
         emit(doc._id, doc)
 
-    getAllDocuments(rule).map (docs) ->
+    helpers.getAllDocuments(rule).map (docs) ->
       _.map(docs, (doc) -> _.omit(doc, ['_rev', '_id']))
 
   
@@ -57,7 +53,7 @@ module.exports = (db) ->
       if doc.type == "build"
         emit(doc._id, doc)
 
-    getAllDocuments(rule).map (rows)->
+    helpers.getAllDocuments(rule).map (rows)->
       _.filter rows, (row) -> 
         row.project == project.name
 
