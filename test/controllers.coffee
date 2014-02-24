@@ -37,15 +37,12 @@ describe 'API', ->
       request(url).get('/api/project/project-2').expect(404).end (err, res) ->
         done()  
 
-    it.skip 'POST creates new Project with random ID', (done) ->   
-      data = { name: "test", displayName: "Test Project" }
+    it 'POST creates new Project with random ID', (done) ->   
+      data = { name: "test", displayName: "Test Project", _id: "ignoredid" }
       request(url).post('/api/project').send(data).end (err, res) ->
-        id = res.id
-
-        request(url).get('/api/project/'+id).end (err, res) ->
-          res.should.have.status(200);
-          res.name.should.equal('test')
-          res.displayName.should.equal('Test Project')
+        request(url).get('/api/project/'+res.body.id).expect(200).end (err, res) ->
+          res.body.name.should.equal('test')
+          res.body.displayName.should.equal('Test Project')
           done()
 
 
