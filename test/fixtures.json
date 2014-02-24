@@ -17,7 +17,7 @@
   "buildNumber": 1,
   "status": "created",
   "start": "2014-02-24T11:09:11.222Z",
-  "tests": []
+  "tests": ["testproject-build-1-test-first_test", "testproject-build-1-test-second_test"]
 },
 {
   "_id": "testproject-build-2",
@@ -26,5 +26,41 @@
   "buildNumber": 2,
   "status": "created",
   "start": "2014-02-24T11:11:11.222Z",
-  "tests": []
+  "tests": ["testproject-build-2-test-first_test", "testproject-build-2-test-second_test"]
+},
+{
+  "_id": "testproject-build-1-test-first_test",
+  "type": "test",
+  "project": "testproject",
+  "testName": "first_test",
+  "buildNumber": 1,
+  "status": "success",
+  "created": "2014-02-24T12:09:11.222Z"
+},
+{
+  "_id": "testproject-build-1-test-second_test",
+  "testName": "second_test",
+  "type": "test",
+  "project": "testproject",
+  "buildNumber": 1,
+  "status": "success",
+  "created": "2014-02-24T12:09:11.222Z"
+},
+{
+  "_id": "testproject-build-2-test-first_test",
+  "type": "test",
+  "project": "testproject",
+  "testName": "first_test",
+  "buildNumber": 2,
+  "status": "fail",
+  "created": "2014-02-24T12:09:11.222Z"
+},
+{
+  "_id": "testproject-build-2-test-second_test",
+  "type": "test",
+  "project": "testproject",
+  "testName": "second_test",
+  "buildNumber": 2,
+  "status": "success",
+  "created": "2014-02-24T12:09:11.222Z"
 }]

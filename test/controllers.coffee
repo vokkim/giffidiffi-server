@@ -115,6 +115,29 @@ describe 'API', ->
             res.body.tests.should.be.empty
             done()
 
+  describe 'Tests', ->
+
+    it 'GET project/testproject/build/2/tests returns all tests', (done) ->   
+      request(url).get('/api/project/testproject/build/2/tests').end (err, res) ->
+        res.status.should.equal(200)
+        res.body.length.should.equal(2)
+        _.each res.body, (build)->
+          build.type.should.equal("test")
+        done()
+
+    describe 'Creating tests', ()->
+
+      it 'POST creates new set of tests', (done) ->   
+        data = [
+          { testName: "first_test" },
+          { testName: "second_test" },
+          { testName: "third_test" }
+        ]
+        request(url).post('/api/project/testproject/build/2/tests').send(data).end (err, res) ->
+          res.status.should.equal(200)
+          res.body.length.should.equal(3)
+          done()
+
 clearDatabase = (db) ->
   (done) ->
     Bacon.fromNodeCallback(db.allDocs, {include_docs: true}).map (result)->

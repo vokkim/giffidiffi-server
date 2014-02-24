@@ -32,9 +32,7 @@ module.exports = (db) ->
         build
 
   findBuild = (request) ->
-    helpers.getProject(request.params.project).flatMap (project) ->
-      Bacon.fromNodeCallback(db.get, project.name+"-build-"+request.params.number)
-    .map (build) ->
+    helpers.getBuild(request.params.project, request.params.number).map (build) ->
       _.omit(build, ['_rev', '_id'])
 
   findAllBuilds = (request) ->

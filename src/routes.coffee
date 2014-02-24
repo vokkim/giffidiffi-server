@@ -40,5 +40,8 @@ setup = (app, controllers) ->
   serveResource(router('get','/api/project/:project/build'), controllers.build.findAllBuilds)
   serveResource(router('get','/api/project/:project/build/:number'), controllers.build.findBuild)
 
+  serveResource(router('post','/api/project/:project/build/:number/tests'), controllers.tests.createTests)
+  serveResource(router('get','/api/project/:project/build/:number/tests'), controllers.tests.findTests)
+
 
 exports.setup = setup
