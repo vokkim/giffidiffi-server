@@ -12,7 +12,7 @@ request = require('supertest')
 _ = require("lodash")
 
 config = {
-  dbname: "./db/giffidiffi-test"
+  dbname: ":memory:"
 }
 url = "http://localhost:3333"
 
@@ -20,13 +20,12 @@ db = server.start(config)
 
 describe 'API', ->
   this.timeout 5000
-  before (done) -> clearDatabase(db)(done)
   before (done) -> setFixtures(db)(done)
-  before (done) -> setTestAttachments(db)(done)
+  #before (done) -> setTestAttachments(db)(done)
 
   describe 'Project', ->
       
-    it 'GET project/ returns all projects', (done) ->   
+    it 'returns all projects', (done) ->   
       request(url).get('/api/project').end (err, res) ->
         res.status.should.equal(200)
         res.body.length.should.equal(2)
@@ -34,13 +33,13 @@ describe 'API', ->
           project.type.should.equal("project")
         done()
 
-    it 'GET project/:id returns matching projects', (done) ->   
+    it 'returns matching projects', (done) ->   
       request(url).get('/api/project/myproject').expect('Content-Type', /json/).end (err, res) -> 
         res.status.should.equal(200)
         res.body.name.should.equal("myproject")
         done()
 
-    it 'GET project/:id with unknown ID returns 404', (done) ->   
+    it 'returns 404 with unknown project ID', (done) ->   
       request(url).get('/api/project/project-2').end (err, res) ->
         res.status.should.equal(404)
         done()  
@@ -48,44 +47,46 @@ describe 'API', ->
     describe 'CRUD operations', ()->
       before (done) ->
         data = { name: "testp", displayName: "POST Test Project", _id: "ignoredid" }
-        request(url).post('/api/project').send(data).end (err, res) -> done()
+        request(url).post('/api/project').send(data).end (err, res) -> 
+          res.body.should.be.empty
+          done()
 
-      it 'POST creates new Project with project name as an ID', (done) ->   
+      it 'creates new Project with project name as an ID', (done) ->   
+        request(url).get('/api/project/testp').end (err, res) ->
+          res.status.should.equal(200)
+          res.body.name.should.equal('testp')
+          res.body.displayName.should.equal('POST Test Project')
+          done()
+
+      it 'returns 409 conflict if ID already exists', (done) ->   
+        data = { name: "testp", displayName: "Conflicting Project" }
+        request(url).post('/api/project').send(data).end (err, res) ->
+          res.status.should.equal(409)
+          done()
+
+      it 'updates project, but not the id/name', (done) ->   
+        data = { name: "modifiedname", displayName: "Modified Test Project", _id: "ignoredid" }
+        request(url).put('/api/project/testp').send(data).end (err, res) ->
           request(url).get('/api/project/testp').end (err, res) ->
             res.status.should.equal(200)
             res.body.name.should.equal('testp')
-            res.body.displayName.should.equal('POST Test Project')
+            res.body.displayName.should.equal('Modified Test Project')
             done()
 
-      it 'POST returns 409 conflict if ID already exists', (done) ->   
-          data = { name: "testp", displayName: "Conflicting Project" }
-          request(url).post('/api/project').send(data).end (err, res) ->
-            res.status.should.equal(409)
-            done()
-
-      it 'PUT updates project, but not the id/name', (done) ->   
-          data = { name: "modifiedname", displayName: "Modified Test Project", _id: "ignoredid" }
-          request(url).put('/api/project/testp').send(data).end (err, res) ->
-            request(url).get('/api/project/testp').end (err, res) ->
-              res.status.should.equal(200)
-              res.body.name.should.equal('testp')
-              res.body.displayName.should.equal('Modified Test Project')
-              done()
-
-      it 'DELETE deletes project', (done) ->   
-          request(url).del('/api/project/testp').end (err, res) ->
-            request(url).get('/api/project/testp').end (err, res) ->
-              res.status.should.equal(404)
-              done()
-
-      it 'DELETE unexisting project returns 404', (done) ->   
-          request(url).del('/api/project/testp').end (err, res) ->
+      it 'deletes project', (done) ->   
+        request(url).del('/api/project/testp').end (err, res) ->
+          request(url).get('/api/project/testp').end (err, res) ->
             res.status.should.equal(404)
             done()
 
+      it 'returns 404 if trying to delete unexisting project', (done) ->   
+        request(url).del('/api/project/testp').end (err, res) ->
+          res.status.should.equal(404)
+          done()
+
   describe 'Build', ->
 
-    it 'GET project/testproject/build returns all builds for testproject', (done) ->   
+    it 'returns all builds for testproject', (done) ->   
       request(url).get('/api/project/testproject/build').end (err, res) ->
         res.status.should.equal(200)
         res.body.length.should.equal(2)
@@ -94,14 +95,14 @@ describe 'API', ->
           build.project.should.equal("testproject")
         done()
 
-    it 'GET project/testproject/build/:id returns matching projects', (done) ->   
+    it 'returns matching project', (done) ->   
       request(url).get('/api/project/testproject/build/2').expect('Content-Type', /json/).end (err, res) -> 
         res.status.should.equal(200)
         res.body.project.should.equal("testproject")
         res.body.buildNumber.should.equal(2)
         done()
 
-    it 'GET project/testproject/build/:id with unknown ID returns 404', (done) ->   
+    it 'returns 404 with unknown build number', (done) ->   
       request(url).get('/api/project/testproject/build/45').end (err, res) ->
         res.status.should.equal(404)
         done()  
@@ -111,7 +112,7 @@ describe 'API', ->
         request(url).post('/api/project/testproject/build').end (err, res) -> 
           done()
 
-      it 'POST creates new Build with incrementing Build ID', (done) ->   
+      it 'creates new Build with incremental Build ID', (done) ->   
           request(url).get('/api/project/testproject/build/3').end (err, res) ->
             res.status.should.equal(200)
             res.body.project.should.equal('testproject')
@@ -120,7 +121,7 @@ describe 'API', ->
             res.body.tests.should.be.empty
             done()
 
-  describe 'Tests', ->
+  describe.skip 'Tests', ->
 
     it 'GET project/testproject/build/2/tests returns all tests', (done) ->   
       request(url).get('/api/project/testproject/build/2/tests').end (err, res) ->
@@ -174,7 +175,10 @@ clearDatabase = (db) ->
 
 setFixtures = (db) ->
   (done) ->
-    Bacon.fromNodeCallback(db.bulkDocs, {docs: fixtures}).onValue () -> done()
+    inserts = _.map fixtures, (data) ->
+      Bacon.fromNodeCallback(db, "run", "INSERT INTO models (id, type, value) VALUES (?, ?, ?)", data.id, data.type, JSON.stringify(data))
+
+    Bacon.combineAsArray(inserts).onValue () -> done()
 
 setTestAttachments = (db) ->
 

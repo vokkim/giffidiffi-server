@@ -1,4 +1,5 @@
 Bacon = require("baconjs")
+_ = require("lodash")
 
 setup = (app, controllers) ->
 
@@ -16,14 +17,26 @@ setup = (app, controllers) ->
       else
         throw new Error "Unrecognized method: "+method
     bus
-   
+
+  determineSqlErrorCode = (errno) ->
+    sqliteErrorCodes =
+      "19": 409
+      "16": 404
+      "23": 403
+    result =  if _.has(sqliteErrorCodes, errno) then sqliteErrorCodes[errno] else 500
+
 
   serveResource = (requestStream, controller) ->
     requestStream.flatMap (val) ->
-      controller(val.request()).map (result) ->
+      controller(val.request())
+      .map (result) ->
         { response: val.response, result: result }
       .mapError (e) ->
-        { error: e, response: val.response }
+        if _.has e, 'status'
+          return { error: e, response: val.response }
+        code = if _.has(e, 'errno') then determineSqlErrorCode(e.errno) else 500
+        return { error: {status: code, cause: e}, response: val.response }
+      
     .onValue (val) ->
       if val.error
         val.response().send val.error.status

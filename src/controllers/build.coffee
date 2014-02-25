@@ -1,4 +1,3 @@
-PouchDB = require("pouchdb")
 Bacon = require("baconjs")
 _ = require("lodash")
 
@@ -6,38 +5,34 @@ module.exports = (db) ->
 
   helpers = require("./helpers")(db)
 
-  getAllBuilds = (project) ->
-    rule = (doc) ->
-      if doc.type == "build"
-        emit(doc._id, doc)
-
-    helpers.getAllDocuments(rule).map (rows)->
-      _.filter rows, (row) -> 
-        row.project == project.name
+  getAllBuilds = (projectName) ->
+    helpers.getProject(projectName).flatMap (project) ->
+      sql = "SELECT * FROM models WHERE type = 'build' AND id LIKE '"+ project.name+"-build-%'"
+      Bacon.fromNodeCallback(db, "all", sql).flatMap(helpers.handleResultRows)
 
   createBuild = (request) ->
-    project = request.params.project
-    helpers.getProject(project).flatMap(getAllBuilds).flatMap (existingBuilds) ->
+    projectName = request.params.project
+    #TODO: Optimize
+    getAllBuilds(projectName).flatMap (existingBuilds) ->
       buildNumber = existingBuilds.length + 1
       build = 
-        _id: project+"-build-"+buildNumber
-        project: project
+        id: projectName+"-build-"+buildNumber
+        project: projectName
         buildNumber: buildNumber
         status: "created"
         start: new Date()
         tests: []
         type: "build"
+      
+      Bacon.fromNodeCallback(db, "run", "INSERT INTO models (id, type, value) VALUES (?, ?, ?)", 
+        build.id, build.type, JSON.stringify(build))
 
-      Bacon.fromNodeCallback(db.post, build).map (res) ->
-        build
 
   findBuild = (request) ->
-    helpers.getBuild(request.params.project, request.params.number).map (build) ->
-      _.omit(build, ['_rev', '_id'])
+    helpers.getBuild(request.params.project, request.params.number)
 
   findAllBuilds = (request) ->
-    helpers.getProject(request.params.project).flatMap(getAllBuilds).map (builds) ->
-      _.map(builds, (build) -> _.omit(build, ['_rev', '_id']))
+    getAllBuilds(request.params.project)
 
   api =
     createBuild: createBuild

@@ -9,37 +9,30 @@ module.exports = (db) ->
 
   createProject = (request) ->
     project = 
-      _id: "project-"+request.body.name
+      id: "project-"+request.body.name
       name: request.body.name
       displayName: request.body.displayName
       type: "project"
 
-    Bacon.fromNodeCallback(db.post, project).map (res) ->
-      project
+    Bacon.fromNodeCallback(db, "run", "INSERT INTO models (id, type, value) VALUES (?, ?, ?)", 
+      project.id, project.type, JSON.stringify(project))
 
   updateProject = (request) ->
     helpers.getProject(request.params.id).flatMap (res) ->
       project = _.merge(res, {displayName: request.body.displayName})
-      Bacon.fromNodeCallback(db.put, project).map (res) ->
-        project
+      Bacon.fromNodeCallback(db, "run", "UPDATE models SET value=? WHERE id=?", 
+        JSON.stringify(project), project.id)
 
   removeProject = (request) ->
-    helpers.getProject(request.params.id).flatMap (res) ->
-      Bacon.fromNodeCallback(db.remove, res).map (res) ->
-        true
+    helpers.getProject(request.params.id).flatMap (project) ->
+      Bacon.fromNodeCallback(db, "run", "DELETE FROM models WHERE id=?", project.id)
 
   findProject = (request) ->
-    helpers.getProject(request.params.id).map (res) ->
-      _.omit(res, ['_rev', '_id'])
+    helpers.getProject(request.params.id)
+   
 
   findAllProjects = () ->
-    rule = (doc) ->
-      if doc.type == "project"
-        emit(doc._id, doc)
-
-    helpers.getAllDocuments(rule).map (docs) ->
-      _.map(docs, (doc) -> _.omit(doc, ['_rev', '_id']))
-
+    helpers.getAllDocumentsByType('project')
   
   getAllBuilds = (project) ->
     rule = (doc) ->

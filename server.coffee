@@ -1,5 +1,6 @@
 express = require("express")
-PouchDB = require('PouchDB')
+sqlite3 = require("sqlite3")
+fs = require('fs')
 
 controllers = require("./src/controllers")
 routes = require("./src/routes")
@@ -20,8 +21,14 @@ initExpressApplication = () ->
 
 app = initExpressApplication()
 
-initDatabase = (name) ->
-  db = new PouchDB name
+initDatabase = (file) ->
+  exists = fs.existsSync(file)
+  db = new sqlite3.Database(file)
+  if !exists
+    db.serialize () ->
+      db.run("CREATE TABLE models (id VARCHAR(255) NOT NULL PRIMARY KEY, type VARCHAR(255) NOT NULL, value TEXT)")
+      db.run("CREATE TABLE attachments (id VARCHAR(255) NOT NULL PRIMARY KEY, value BLOB)")
+  db
 
 start = (config) ->
   db = initDatabase config.dbname
