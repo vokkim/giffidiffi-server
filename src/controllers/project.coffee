@@ -8,18 +8,11 @@ module.exports = (db) ->
   helpers = require("./helpers")(db)
 
   createProject = (request) ->
-    if _.isEmpty(request.body.displayName)
-      return Bacon.Error "Must provide displayName"
-
-    if _.isEmpty(request.body.name)
-      return Bacon.Error "Must provide name"
-
     project = 
       _id: "project-"+request.body.name
       name: request.body.name
       displayName: request.body.displayName
       type: "project"
-    
 
     Bacon.fromNodeCallback(db.post, project).map (res) ->
       project

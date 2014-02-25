@@ -43,11 +43,17 @@ module.exports = (db) ->
     projectName = request.params.project
     buildNumber = parseInt(request.params.number)
     testName = request.params.test
-    Bacon.fromNodeCallback(db.get, projectName+"-build-"+buildNumber+"-test-"+testName).flatMap (res) ->
-      Bacon.combineTemplate { 
-        data: Bacon.fromNodeCallback(db.getAttachment, res._id, testName)
-        contentType: res._attachments[testName].content_type
-      }
+    requestedImage = request.params.image
+
+    if _.contains(["original", "diff"], requestedImage)
+      return Bacon.fromNodeCallback(db.get, projectName+"-build-"+buildNumber+"-test-"+testName).flatMap (res) ->
+        if _.has(res._attachments, requestedImage)
+          image = Bacon.fromNodeCallback(db.getAttachment, res._id, requestedImage)
+          return Bacon.combineTemplate { data: image, contentType: res._attachments[requestedImage].content_type }
+        else 
+          return Bacon.once(new Bacon.Error { cause: "No " + requestedImage + " image for test " + testName, status: 404 } )
+    else
+      return Bacon.once(new Bacon.Error {cause: "Unknown image type: " + requestedImage, status: 400})
 
   api =
     createTests: createTests

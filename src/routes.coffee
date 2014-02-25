@@ -35,6 +35,7 @@ setup = (app, controllers) ->
       controller(val.request()).map (result) ->
         { response: val.response, result: result }
       .mapError (e) ->
+        #console.error "Error: ", e
         { error: e, response: val.response }
     .onValue (val) ->
       if val.error
@@ -54,7 +55,8 @@ setup = (app, controllers) ->
 
   serveResource(router('post','/api/project/:project/build/:number/tests'), controllers.tests.createTests)
   serveResource(router('get','/api/project/:project/build/:number/tests'), controllers.tests.findTests)
-  serveFile(router('get','/api/project/:project/build/:number/tests/:test/image'), controllers.tests.findTestOriginalImage)
+  
+  serveFile(router('get','/api/project/:project/build/:number/tests/:test/:image'), controllers.tests.findTestOriginalImage)
 
 
 exports.setup = setup

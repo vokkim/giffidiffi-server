@@ -1,5 +1,6 @@
 fs = require('fs')
 Buffer = require('buffer').Buffer;
+buffertools = require('buffertools')
 server = require('../server')
 fixtures = require('./fixtures.json')
 attachments = require('./attachments.json')
@@ -129,14 +130,24 @@ describe 'API', ->
           build.type.should.equal("test")
         done()
 
-     it 'get image for test', (done) ->   
-      request(url).get('/api/project/testproject/build/2/tests/first_test/image').expect('Content-Type', /png/).end (err, res) ->
+    it 'get original image for test', (done) ->   
+      request(url).get('/api/project/testproject/build/2/tests/first_test/original').expect('Content-Type', /png/)
+      .parse(imageParser).end (err, res) ->
         res.status.should.equal(200)
+        imageComparator('./test/2_first_test.png', res.body, done)
+
+    it 'get difference image for test', (done) ->   
+      request(url).get('/api/project/testproject/build/2/tests/first_test/diff').expect('Content-Type', /png/)
+      .parse(imageParser).end (err, res) ->
+        res.status.should.equal(200)
+        imageComparator('./test/2_first_test.diff.png', res.body, done)
+
+    it 'returns 404 if no difference image exists', (done) ->   
+      request(url).get('/api/project/testproject/build/1/tests/first_test/diff').end (err, res) ->
+        res.status.should.equal(404)
         done()
-
-
+      
     describe 'Creating tests', ()->
-
       it 'POST creates new set of tests', (done) ->   
         data = [
           { testName: "first_test" },
@@ -166,12 +177,39 @@ setFixtures = (db) ->
     Bacon.fromNodeCallback(db.bulkDocs, {docs: fixtures}).onValue () -> done()
 
 setTestAttachments = (db) ->
+
+  saveImage = (docId, rev, imageFile, type) ->
+    Bacon.fromNodeCallback(fs.readFile, imageFile).flatMap (data)->
+      Bacon.fromNodeCallback(db.putAttachment, docId, type, rev, data, "image/png")
+
   (done) ->
     streams = _.map attachments, (attachment) ->
-      Bacon.fromNodeCallback(fs.readFile, attachment.file).flatMap (data)->
-        Bacon.fromNodeCallback(db.get, attachment.testId).flatMap (doc) ->
-          Bacon.fromNodeCallback(db.putAttachment, doc._id, doc.testName, doc._rev, data, "image/png")
+      Bacon.fromNodeCallback(db.get, attachment.testId).flatMap (doc) ->
+        imageStream = saveImage(doc._id, doc._rev, attachment.original, "original")
+
+        if attachment.diff
+          imageStream = imageStream.flatMap (res) -> saveImage(doc._id, res.rev, attachment.diff, "diff")
+
+        return imageStream
     Bacon.combineAsArray(streams).onValue ()-> done()
+
+
+imageParser = (res, callback) ->
+    res.setEncoding('binary')
+    res.data = ''
+    res.on 'data', (chunk) ->
+        res.data += chunk;
+    res.on 'end', () ->
+        callback(null, new Buffer(res.data, 'binary'));
+
+imageComparator = (expectedImage, data, done) ->
+  Bacon.fromNodeCallback(fs.readFile, expectedImage)
+  .mapError (e) ->
+    console.log "Error comparing images ", e
+    0
+  .onValue (expectedData)->
+    should(buffertools.compare(expectedData, data)).equal(0)
+    done()
 
 
     
