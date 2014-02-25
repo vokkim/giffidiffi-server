@@ -6,20 +6,17 @@ controllers = require("./src/controllers")
 routes = require("./src/routes")
 
 initExpressApplication = () ->
-  application = express()
-  application.use express.json()
-  application.use express.urlencoded()
-  application.use express.multipart()
+  app = express()
+  app.use express.json()
+  app.use express.urlencoded()
+  app.use express.multipart()
 
-  application.configure 'development', () ->
-    application.use express.errorHandler({ dumpExceptions: true, showStack: true })
+  app.configure 'development', () ->
+    app.use express.errorHandler({ dumpExceptions: true, showStack: true })
 
-  application.configure 'production', () ->
-    application.use express.errorHandler()
-
-  application
-
-app = initExpressApplication()
+  app.configure 'production', () ->
+    app.use express.errorHandler()
+  app
 
 initDatabase = (file) ->
   exists = fs.existsSync(file)
@@ -30,14 +27,19 @@ initDatabase = (file) ->
       db.run("CREATE TABLE attachments (id VARCHAR(255) NOT NULL PRIMARY KEY, type VARCHAR(255) NOT NULL, value BLOB)")
   db
 
-start = (config) ->
-  db = initDatabase config.dbname
+module.exports = (config) ->
+  app = initExpressApplication()
+  db = initDatabase config.dbfile
   controllers = controllers db
   routes.setup app, controllers 
-  port = process.env.PORT || 3000
+  port = config.port #process.env.PORT || 3000
   app.listen port
   console.log "%s server on port %d", app.settings.env, port
-  db
 
-exports.app = app
-exports.start = start
+  api =
+    app: app
+    db: db
+
+
+
+

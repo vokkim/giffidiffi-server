@@ -1,3 +1,3 @@
-module.exports = {
-  dbname: "./db/giffidiffi-test"
-}
+module.exports = 
+  dbfile: "./db/giffidiffi-test"
+  port: 3000
