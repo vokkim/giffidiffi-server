@@ -9,7 +9,6 @@ initExpressApplication = () ->
   app = express()
   app.use express.json()
   app.use express.urlencoded()
-  app.use express.multipart()
 
   app.configure 'development', () ->
     app.use express.errorHandler({ dumpExceptions: true, showStack: true })
