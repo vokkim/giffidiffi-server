@@ -1,18 +1,24 @@
 [{
-  "original": "./test/1_first_test.png",
-  "testId": "testproject-build-1-test-first_test"
+  "file": "./test/1_first_test.png",
+  "id": "testproject-build-1-test-first_test-original"
 },
 {
-  "original": "./test/2_first_test.png",
-  "diff": "./test/2_first_test.diff.png",
-  "testId": "testproject-build-2-test-first_test"
+  "file": "./test/2_first_test.png",
+  "id": "testproject-build-2-test-first_test-original"
 },
 {
-  "original": "./test/second_test.png",
-  "testId": "testproject-build-1-test-second_test"
+  "file": "./test/2_first_test.diff.png",
+  "id": "testproject-build-2-test-first_test-diff"
 },
 {
-  "original": "./test/second_test.png",
-  "diff": "./test/second_test.diff.png",
-  "testId": "testproject-build-2-test-second_test"
+  "file": "./test/second_test.png",
+  "id": "testproject-build-1-test-second_test-original"
+},
+{
+  "file": "./test/second_test.png",
+  "id": "testproject-build-2-test-second_test-original"
+},
+{
+  "file": "./test/second_test.diff.png",
+  "id": "testproject-build-2-test-second_test-diff"
 }]

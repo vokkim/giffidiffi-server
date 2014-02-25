@@ -1,4 +1,3 @@
-PouchDB = require("pouchdb")
 Bacon = require("baconjs")
 _ = require("lodash")
 

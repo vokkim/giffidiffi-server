@@ -1,4 +1,3 @@
-PouchDB = require("pouchdb")
 Bacon = require("baconjs")
 _ = require("lodash")
 
@@ -9,15 +8,10 @@ module.exports = (db) ->
   findTests = (request) ->
     projectName = request.params.project
     buildNumber = parseInt(request.params.number)
+
     helpers.getBuild(projectName, buildNumber).flatMap (build) ->
-      rule = (doc) ->
-        if doc.type == "test"
-          emit(doc._id, doc)
-      helpers.getAllDocuments(rule).map (rows) ->
-        _.filter rows, (row) -> 
-          row.project == projectName && row.buildNumber == buildNumber
-    .map (tests) ->
-      _.map(tests, (tests) -> _.omit(tests, ['_rev', '_id']))
+      sql = "SELECT * FROM models WHERE type = 'test' AND id LIKE '" + projectName + "-build-" + buildNumber + "-test-%'"
+      Bacon.fromNodeCallback(db, "all", sql).flatMap(helpers.handleResultRows)
 
   createTests = (request) ->
     projectName = request.params.project
@@ -45,13 +39,16 @@ module.exports = (db) ->
     testName = request.params.test
     requestedImage = request.params.image
 
-    if _.contains(["original", "diff"], requestedImage)
-      return Bacon.fromNodeCallback(db.get, projectName+"-build-"+buildNumber+"-test-"+testName).flatMap (res) ->
-        if _.has(res._attachments, requestedImage)
-          image = Bacon.fromNodeCallback(db.getAttachment, res._id, requestedImage)
-          return Bacon.combineTemplate { data: image, contentType: res._attachments[requestedImage].content_type }
-        else 
-          return Bacon.once(new Bacon.Error { cause: "No " + requestedImage + " image for test " + testName, status: 404 } )
+    if _.contains(["original", "diff", "reference"], requestedImage)
+
+      return helpers.getBuild(projectName, buildNumber).flatMap (build) ->
+        sql = "SELECT * FROM models WHERE type = 'test' AND id = '" + projectName + "-build-" + buildNumber + "-test-"+testName+"'"
+        Bacon.fromNodeCallback(db, "get", sql).flatMap(helpers.handleResultRow).flatMap (test) ->
+          Bacon.fromNodeCallback(db, "get", "SELECT * FROM attachments WHERE id=?", test.images[requestedImage])
+          .flatMap (attachment) ->
+            if _.isEmpty(attachment)
+              return new Bacon.Error {cause: "No " + requestedImage + " image", status: 404}
+            { data: attachment.value, contentType: attachment.type }
     else
       return Bacon.once(new Bacon.Error {cause: "Unknown image type: " + requestedImage, status: 400})
 

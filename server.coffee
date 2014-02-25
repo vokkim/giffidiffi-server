@@ -27,7 +27,7 @@ initDatabase = (file) ->
   if !exists
     db.serialize () ->
       db.run("CREATE TABLE models (id VARCHAR(255) NOT NULL PRIMARY KEY, type VARCHAR(255) NOT NULL, value TEXT)")
-      db.run("CREATE TABLE attachments (id VARCHAR(255) NOT NULL PRIMARY KEY, value BLOB)")
+      db.run("CREATE TABLE attachments (id VARCHAR(255) NOT NULL PRIMARY KEY, type VARCHAR(255) NOT NULL, value BLOB)")
   db
 
 start = (config) ->

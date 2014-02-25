@@ -6,7 +6,6 @@ fixtures = require('./fixtures.json')
 attachments = require('./attachments.json')
 Bacon = require('baconjs')
 assert = require('assert')
-PouchDB = require('PouchDB')
 should = require('should')
 request = require('supertest')
 _ = require("lodash")
@@ -21,7 +20,7 @@ db = server.start(config)
 describe 'API', ->
   this.timeout 5000
   before (done) -> setFixtures(db)(done)
-  #before (done) -> setTestAttachments(db)(done)
+  before (done) -> setTestAttachments(db)(done)
 
   describe 'Project', ->
       
@@ -121,9 +120,9 @@ describe 'API', ->
             res.body.tests.should.be.empty
             done()
 
-  describe.skip 'Tests', ->
+  describe 'Tests', ->
 
-    it 'GET project/testproject/build/2/tests returns all tests', (done) ->   
+    it 'returns all tests', (done) ->   
       request(url).get('/api/project/testproject/build/2/tests').end (err, res) ->
         res.status.should.equal(200)
         res.body.length.should.equal(2)
@@ -131,7 +130,7 @@ describe 'API', ->
           build.type.should.equal("test")
         done()
 
-    it 'get original image for test', (done) ->   
+    it 'returns original image for test', (done) ->   
       request(url).get('/api/project/testproject/build/2/tests/first_test/original').expect('Content-Type', /png/)
       .parse(imageParser).end (err, res) ->
         res.status.should.equal(200)
@@ -143,12 +142,23 @@ describe 'API', ->
         res.status.should.equal(200)
         imageComparator('./test/2_first_test.diff.png', res.body, done)
 
+    it 'get reference image for test', (done) ->   
+      request(url).get('/api/project/testproject/build/2/tests/first_test/reference').expect('Content-Type', /png/)
+      .parse(imageParser).end (err, res) ->
+        res.status.should.equal(200)
+        imageComparator('./test/1_first_test.png', res.body, done)
+
     it 'returns 404 if no difference image exists', (done) ->   
       request(url).get('/api/project/testproject/build/1/tests/first_test/diff').end (err, res) ->
         res.status.should.equal(404)
         done()
+
+    it 'returns 400 if wrong image resource requested', (done) ->   
+      request(url).get('/api/project/testproject/build/2/tests/first_test/asd').end (err, res) ->
+        res.status.should.equal(400)
+        done()
       
-    describe 'Creating tests', ()->
+    describe.skip 'Creating tests', ()->
       it 'POST creates new set of tests', (done) ->   
         data = [
           { testName: "first_test" },
@@ -160,18 +170,6 @@ describe 'API', ->
           res.body.length.should.equal(3)
           done()
 
-clearDatabase = (db) ->
-  (done) ->
-    Bacon.fromNodeCallback(db.allDocs, {include_docs: true}).map (result)->
-      _.map result.rows, (row) -> 
-        row.doc
-    .flatMap (docs)->
-      docs = _.map docs, (doc) -> _.merge(doc, {_deleted: true})
-      if _.isEmpty docs
-        Bacon.once(true)
-      else
-        Bacon.fromNodeCallback(db.bulkDocs, {docs: docs})
-    .onValue () -> done()
 
 setFixtures = (db) ->
   (done) ->
@@ -181,21 +179,12 @@ setFixtures = (db) ->
     Bacon.combineAsArray(inserts).onValue () -> done()
 
 setTestAttachments = (db) ->
-
-  saveImage = (docId, rev, imageFile, type) ->
-    Bacon.fromNodeCallback(fs.readFile, imageFile).flatMap (data)->
-      Bacon.fromNodeCallback(db.putAttachment, docId, type, rev, data, "image/png")
-
   (done) ->
-    streams = _.map attachments, (attachment) ->
-      Bacon.fromNodeCallback(db.get, attachment.testId).flatMap (doc) ->
-        imageStream = saveImage(doc._id, doc._rev, attachment.original, "original")
+    inserts = _.map attachments, (attachment) ->
+      Bacon.fromNodeCallback(fs.readFile, attachment.file).flatMap (data)->
+        Bacon.fromNodeCallback(db, "run", "INSERT INTO attachments (id, type, value) VALUES (?, ?, ?)", attachment.id, "image/png", data)
 
-        if attachment.diff
-          imageStream = imageStream.flatMap (res) -> saveImage(doc._id, res.rev, attachment.diff, "diff")
-
-        return imageStream
-    Bacon.combineAsArray(streams).onValue ()-> done()
+    Bacon.combineAsArray(inserts).onValue () -> done()
 
 
 imageParser = (res, callback) ->
