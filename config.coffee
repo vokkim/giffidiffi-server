@@ -1,3 +1,3 @@
 module.exports = 
-  dbfile: "./db/giffidiffi-test"
-  port: 3000
+  dbfile: process.env.DBFILE || "./db/giffidiffi-test" 
+  port: process.env.PORT || 3000

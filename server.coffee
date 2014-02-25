@@ -32,9 +32,8 @@ module.exports = (config) ->
   db = initDatabase config.dbfile
   controllers = controllers db
   routes.setup app, controllers 
-  port = config.port #process.env.PORT || 3000
-  app.listen port
-  console.log "%s server on port %d", app.settings.env, port
+  app.listen config.port 
+  console.log "Starting %s server, dbfile %s, port %d", app.settings.env, config.dbfile, config.port
 
   api =
     app: app
