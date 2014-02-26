@@ -7,10 +7,6 @@ module.exports = (db) ->
     sql = "SELECT * FROM models WHERE type = 'project' AND id='project-"+name+"'"
     Bacon.fromNodeCallback(db, "get", sql).flatMap(handleResultRow)
 
-  getAllDocuments = (ruleF) ->
-    Bacon.fromNodeCallback(db.query, {map: ruleF}).map (res) ->
-      _.pluck(res.rows, 'value')
-
   getAllDocumentsByType = (type) ->
     Bacon.fromNodeCallback(db, "all", "SELECT * FROM models WHERE type = ?", type).flatMap(handleResultRows)
 
