@@ -1,8 +1,7 @@
 Bacon = require("baconjs")
 _ = require("lodash")
 fs = require('fs')
-temp = require('temp')
-gm = require('gm')
+imageComparison = require('../image_comparison')
 
 module.exports = (db) ->
 
@@ -29,37 +28,25 @@ module.exports = (db) ->
 
   compareImages = (originalImage, referenceImageId) ->
     Bacon.fromNodeCallback(db, "get", "SELECT * FROM attachments WHERE id=?", referenceImageId).flatMap (referenceImage) ->
-      originalTempFile = createTempFile(originalImage.value)
-      referenceTempFile = createTempFile(referenceImage.value)
-      compareImageFiles(originalTempFile, referenceTempFile).flatMap (result) ->
-        Bacon.combineTemplate {
-          result: if result.isEqual then "success" else "fail"
-          diffData: Bacon.fromNodeCallback(fs.readFile, result.diff)
-        }
+      imageComparison(originalImage, referenceImage)
 
-  compareImageFiles = (fileA, fileB) ->
-    # Use Bacon.Bus to hack the gm.compare, Bacon.fromCallback did not seem to work properly for some reason?
-    bus = new Bacon.Bus()
-    opt = 
-      highlightColor: 'yellow'
-      tolerance: 0.002
-      file: temp.path({suffix: '.png', prefix: 'giffidiffi-'})
+  createTest = (projectName, buildNumber, testName, result, originalImageId, referenceImageId, diffImageId) ->
+    test = 
+      id: projectName+"-build-"+buildNumber+"-test-"+testName
+      project: projectName
+      buildNumber: buildNumber
+      testName: testName
+      status: result
+      created: new Date()
+      type: "test"
+      images: 
+        original: originalImageId
+        reference: referenceImageId
+        diff: diffImageId
 
-    gm.compare fileA, fileB, opt, (err, isEqual, equality, raw) ->
-      if (err) 
-        bus.error(new Bacon.Error(err))
-      else 
-        bus.push({'isEqual': isEqual, 'equality': equality, 'diff': opt.file})
-      bus.end()
+    helpers.storeDocument(test)
 
-    bus
-
-  createTempFile = (stream) ->
-    tempFile = temp.createWriteStream()
-    tempFile.write(stream)
-    tempFile.path
-
-  createTests = (request) ->
+  runNewTest = (request) ->
     projectName = request.params.project
     buildNumber = parseInt(request.params.number)
     postData = JSON.parse(request.body.data)
@@ -76,20 +63,8 @@ module.exports = (db) ->
         resultS.flatMap (result) ->
           diffImageId = if result.diffData then generateAttachmentId(projectName, buildNumber, testName, "diff") else null
 
-          test = 
-            id: projectName+"-build-"+buildNumber+"-test-"+testName
-            project: projectName
-            buildNumber: buildNumber
-            testName: testName
-            status: result.result
-            created: new Date()
-            type: "test"
-            images: 
-              original: originalImage.id
-              reference: referenceImageId
-              diff: diffImageId
-
-          streams = [helpers.storeDocument(test), helpers.storeAttachment(originalImage)]
+          streams = [createTest(projectName, buildNumber, testName, result.result, originalImage.id, referenceImageId, diffImageId),
+                     helpers.storeAttachment(originalImage)]
 
           if diffImageId
             streams.push(helpers.storeAttachment({id: diffImageId, type: "image/png", value: result.diffData }))
@@ -113,7 +88,6 @@ module.exports = (db) ->
     requestedImage = request.params.image
 
     if _.contains(["original", "diff", "reference"], requestedImage)
-
       return helpers.getBuild(projectName, buildNumber).flatMap (build) ->
         sql = "SELECT * FROM models WHERE type = 'test' AND id = '" + projectName + "-build-" + buildNumber + "-test-" + testName + "'"
         Bacon.fromNodeCallback(db, "get", sql).flatMap(helpers.handleResultRow).flatMap (test) ->
@@ -126,7 +100,7 @@ module.exports = (db) ->
       return Bacon.once(new Bacon.Error {cause: "Unknown image type: " + requestedImage, status: 400})
 
   api =
-    createTests: createTests
+    createTests: runNewTest
     findTests: findTests
     findTestOriginalImage: findTestOriginalImage
 
