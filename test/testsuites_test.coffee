@@ -48,16 +48,45 @@ describe 'Testsuites', ->
       res.status.should.equal(400)
       done()
     
-  describe.skip 'Creating tests', ()->
-    it 'POST creates new set of tests', (done) ->   
-      data = [
-        { testName: "first_test" },
-        { testName: "second_test" },
-        { testName: "third_test" }
-      ]
-      request(url).post('/api/project/testproject/build/2/tests').send(data).end (err, res) ->
+  describe 'Adding new test', ()->
+
+    it 'creates new test and returns success', (done) ->   
+      data = { testName: "first_test" }
+      request(url).post('/api/project/testproject/build/3/tests')
+        .field('data', JSON.stringify(data))
+        .attach('first_test', './test/new_first_test.png')
+        .end (err, res) ->
+          res.status.should.equal(200)
+          res.body.result.should.equal("success")
+          done()
+
+  describe 'Adding new (failing) test', ()->
+
+    it 'create test and returns fail', (done) ->   
+      data = { testName: "second_test" }
+      request(url).post('/api/project/testproject/build/3/tests')
+        .field('data', JSON.stringify(data))
+        .attach('second_test', './test/new_second_test.png')
+        .end (err, res) ->
+          res.status.should.equal(200)
+          res.body.result.should.equal("fail")
+          done()
+
+    it 'returns correct original image for test', (done) ->   
+      request(url).get('/api/project/testproject/build/3/tests/second_test/original').parse(imageParser).end (err, res) ->
         res.status.should.equal(200)
-        res.body.length.should.equal(3)
+        imageComparator('./test/new_second_test.png', res.body, done)
+
+    it 'returns correct reference image for test', (done) ->   
+      request(url).get('/api/project/testproject/build/3/tests/second_test/reference').parse(imageParser).end (err, res) ->
+        res.status.should.equal(200)
+        imageComparator('./test/second_test.png', res.body, done)
+
+    it 'returns difference image', (done) ->   
+      request(url).get('/api/project/testproject/build/3/tests/second_test/diff').end (err, res) ->
+        res.status.should.equal(200)
+        res.type.should.equal("image/png")
+        res.header['content-length'].should.above(10000)
         done()
 
 

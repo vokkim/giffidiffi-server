@@ -23,9 +23,19 @@ module.exports = (db) ->
         return new Bacon.Error { cause: "Not found", status: 404 }
     JSON.parse row.value
 
+  storeDocument = (doc) ->
+    Bacon.fromNodeCallback(db, "run", "INSERT INTO models (id, type, value) VALUES (?, ?, ?)", 
+      doc.id, doc.type, JSON.stringify(doc)).map () -> doc
+
+  storeAttachment = (attachment) ->
+    Bacon.fromNodeCallback(db, "run", "INSERT INTO attachments (id, type, value) VALUES (?, ?, ?)", 
+      attachment.id, attachment.type, attachment.value).map () -> attachment
+
   api = 
     getProject: getProject
     getAllDocumentsByType: getAllDocumentsByType
     getBuild: getBuild
     handleResultRow: handleResultRow
     handleResultRows: handleResultRows
+    storeDocument: storeDocument
+    storeAttachment: storeAttachment

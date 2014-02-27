@@ -1,9 +1,10 @@
 Bacon = require("baconjs")
 _ = require("lodash")
+express = require("express")
 
 setup = (app, controllers) ->
 
-  router = (method, path) ->
+  router = (method, path, middleware) ->
     bus = new Bacon.Bus()
     cb = (req, res) ->
       bus.push
@@ -16,6 +17,8 @@ setup = (app, controllers) ->
       when "delete" then app.del(path, cb)
       else
         throw new Error "Unrecognized method: "+method
+    #if middleware
+    #  app.use('api/project/', middleware)
     bus
 
   determineSqlErrorCode = (errno) ->
@@ -66,7 +69,7 @@ setup = (app, controllers) ->
   serveResource(router('get','/api/project/:project/build'), controllers.build.findAllBuilds)
   serveResource(router('get','/api/project/:project/build/:number'), controllers.build.findBuild)
 
-  serveResource(router('post','/api/project/:project/build/:number/tests'), controllers.tests.createTests)
+  serveResource(router('post','/api/project/:project/build/:number/tests', express.multipart()), controllers.tests.createTests)
   serveResource(router('get','/api/project/:project/build/:number/tests'), controllers.tests.findTests)
   
   serveFile(router('get','/api/project/:project/build/:number/tests/:test/:image'), controllers.tests.findTestOriginalImage)
