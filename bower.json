@@ -3,13 +3,13 @@
   "version": "0.0.1",
   "main": [],
   "dependencies": {
-    "requirejs": "2.1.11",
-    "lodash": "2.4.1",
-    "less": "1.7.0", 
-    "bacon": "0.7.6",
-    "bacon.jquery": "0.4.6",
-    "jquery": "1.11.0",
-    "handlebars": "v1.3.0",
-    "bootstrap": "3.1.1"
+    "requirejs": "git://github.com/jrburke/requirejs.git#2.1.11",
+    "lodash": "git://github.com/bestiejs/lodash#2.4.1",
+    "less": "git://github.com/less/less.js.git#1.7.0", 
+    "bacon.js": "git://github.com/baconjs/bacon.js.git#0.7.6",
+    "bacon.jquery": "git://github.com/baconjs/bacon.jquery#0.4.6",
+    "jquery": "git://github.com/components/jquery.git#1.11.0",
+    "handlebars": "git://github.com/wycats/handlebars.js.git#v1.3.0",
+    "bootstrap": "git://github.com/twbs/bootstrap.git#3.1.1"
   }
 }

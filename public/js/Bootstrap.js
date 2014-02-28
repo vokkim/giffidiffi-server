@@ -16,8 +16,8 @@ requirejs.config({
     "bacon.jquery": {
       deps: ["bacon"]
     },
-    "App": {
-      deps: ["bacon.jquery"]
+    "ClientApp": {
+      deps: ["bacon"]
     },
     'handlebars': {
       exports: 'Handlebars'
@@ -25,7 +25,8 @@ requirejs.config({
   }
 })
 
-
-;(function() {
-  console.log("STARTED!")
+(function() {
+  require(["ClientApp"], function(app) {
+    console.log("STARTED!")
+  })
 }());
