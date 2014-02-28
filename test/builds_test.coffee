@@ -4,7 +4,7 @@ should = require('should')
 request = require('supertest')
 _ = require("lodash")
 
-url = require("./helper").url
+url = require("./test_helper").url
 
 
 describe 'Build', ->
@@ -30,13 +30,11 @@ describe 'Build', ->
       res.status.should.equal(404)
       done()  
 
-  describe 'CRUD operations', ()->
-      
-    it 'creates new Build with incremental Build ID', (done) ->   
-      request(url).post('/api/project/testproject/build').end (err, res) -> 
-        res.status.should.equal(200)
-        res.body.project.should.equal('testproject')
-        res.body.status.should.equal('created')
-        res.body.buildNumber.should.equal(4)
-        res.body.tests.should.be.empty
-        done()
+  it 'creates new Build with incremental Build ID', (done) ->   
+    request(url).post('/api/project/testproject/build').end (err, res) -> 
+      res.status.should.equal(200)
+      res.body.project.should.equal('testproject')
+      res.body.status.should.equal('created')
+      res.body.buildNumber.should.equal(4)
+      res.body.tests.should.be.empty
+      done()

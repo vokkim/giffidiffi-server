@@ -1,12 +1,7 @@
 fs = require('fs')
-Buffer = require('buffer').Buffer;
-buffertools = require('buffertools')
 fixtures = require('./fixtures.json')
 attachments = require('./attachments.json')
 Bacon = require('baconjs')
-assert = require('assert')
-should = require('should')
-request = require('supertest')
 _ = require("lodash")
 
 config = 
@@ -14,7 +9,6 @@ config =
   port: 3333
 
 server = require('../server')(config)
-
 
 module.exports.url = "http://localhost:3333"
 db = server.db

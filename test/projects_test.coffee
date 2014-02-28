@@ -4,7 +4,7 @@ should = require('should')
 request = require('supertest')
 _ = require("lodash")
 
-url = require("./helper").url
+url = require("./test_helper").url
 
 describe 'Project', ->
     
