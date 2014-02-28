@@ -51,7 +51,7 @@ describe 'Testsuites', ->
     
   describe 'Adding new test', ()->
 
-    it 'creates new test and returns success', (done) ->   
+    it 'creates a new test and returns success', (done) ->   
       data = { testName: "first_test" }
       request(url).post('/api/project/testproject/build/3/tests').field('data', JSON.stringify(data))
         .attach('first_test', './test/new_first_test.png')
@@ -60,17 +60,26 @@ describe 'Testsuites', ->
           res.body.result.should.equal("success")
           done()
 
-   it 'does not allow to add tests to completed build', (done) ->   
-    data = { testName: "new_test" }
-    request(url).post('/api/project/testproject/build/2/tests').field('data', JSON.stringify(data))
-      .attach('new_test', './test/new_first_test.png')
-      .end (err, res) ->
-        res.status.should.equal(409)
-        done()
+    it 'creates a new test without prior history, returns success', (done) ->   
+      data = { testName: "third_test" }
+      request(url).post('/api/project/testproject/build/3/tests').field('data', JSON.stringify(data))
+        .attach('third_test', './test/2_first_test.png')
+        .end (err, res) ->
+          res.status.should.equal(200)
+          res.body.result.should.equal("success")
+          done()
+
+    it 'does not allow to add tests to completed build', (done) ->   
+      data = { testName: "new_test" }
+      request(url).post('/api/project/testproject/build/2/tests').field('data', JSON.stringify(data))
+        .attach('new_test', './test/new_first_test.png')
+        .end (err, res) ->
+          res.status.should.equal(409)
+          done()
 
   describe 'Adding new (failing) test', ()->
 
-    it 'create test and returns fail', (done) ->   
+    it 'creates a new test and returns fail', (done) ->   
       data = { testName: "second_test" }
       request(url).post('/api/project/testproject/build/3/tests')
         .field('data', JSON.stringify(data))
@@ -104,7 +113,7 @@ describe 'Testsuites', ->
       request(url).post('/api/project/testproject/build/3/done').end (err, res) ->
         res.status.should.equal(200)
         res.body.status.should.equal("fail")
-        res.body.tests.should.containDeep(["first_test", "second_test"])
+        res.body.tests.should.containDeep(["first_test", "third_test", "second_test"])
         res.body.end.should.be.ok
         done()
 

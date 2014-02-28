@@ -35,6 +35,7 @@ setup = (app, controllers) ->
       .map (result) ->
         { response: val.response, result: result }
       .mapError (e) ->
+        #console.log "ERRR ", e, val.request().path
         if _.has e, 'status'
           return { error: e, response: val.response }
         code = if _.has(e, 'errno') then determineSqlErrorCode(e.errno) else 500
@@ -73,7 +74,7 @@ setup = (app, controllers) ->
   serveResource(router('get','/api/project/:project/build/:number/tests'), controllers.tests.findTests)
   serveResource(router('post','/api/project/:project/build/:number/done'), controllers.build.markAsDone)
   
-  serveFile(router('get','/api/project/:project/build/:number/tests/:test/:image'), controllers.tests.findTestOriginalImage)
+  serveFile(router('get','/api/project/:project/build/:number/tests/:test/:image'), controllers.tests.findTestImage)
 
 
 exports.setup = setup

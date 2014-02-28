@@ -33,7 +33,7 @@ module.exports = (db) ->
   markAsDone = (request) ->
     helpers.getBuild(request.params.project, request.params.number).flatMap (build) ->
       if build.status != "created"
-        return new Bacon.Error {status: 400, cause: "Build already final"}
+        return new Bacon.Error {status: 400, cause: "Build already complete!"}
       testResults = _.map build.tests, (testName) ->
         helpers.getTest(build.project, build.buildNumber, testName).map (test) ->
           test.status

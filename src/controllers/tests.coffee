@@ -86,7 +86,7 @@ module.exports = (db) ->
       type: fileHandle.type
     }
 
-  findTestOriginalImage = (request) ->
+  findTestImage = (request) ->
     projectName = request.params.project
     buildNumber = parseInt(request.params.number)
     testName = request.params.test
@@ -105,5 +105,5 @@ module.exports = (db) ->
   api =
     createTests: runNewTest
     findTests: findTests
-    findTestOriginalImage: findTestOriginalImage
+    findTestImage: findTestImage
 
