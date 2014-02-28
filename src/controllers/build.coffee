@@ -7,7 +7,7 @@ module.exports = (db) ->
 
   getAllBuilds = (projectName) ->
     helpers.getProject(projectName).flatMap (project) ->
-      sql = "SELECT * FROM models WHERE type = 'build' AND id LIKE '"+ project.name+"-build-%'"
+      sql = "SELECT * FROM documents WHERE type = 'build' AND id LIKE '"+ project.name+"-build-%'"
       Bacon.fromNodeCallback(db, "all", sql).flatMap(helpers.handleResultRows)
 
   createBuild = (request) ->
@@ -24,7 +24,7 @@ module.exports = (db) ->
         tests: []
         type: "build"
       
-      Bacon.fromNodeCallback(db, "run", "INSERT INTO models (id, type, value) VALUES (?, ?, ?)", 
+      Bacon.fromNodeCallback(db, "run", "INSERT INTO documents (id, type, value) VALUES (?, ?, ?)", 
         build.id, build.type, JSON.stringify(build))
 
 

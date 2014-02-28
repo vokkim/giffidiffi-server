@@ -12,11 +12,11 @@ module.exports = (db) ->
     buildNumber = parseInt(request.params.number)
 
     helpers.getBuild(projectName, buildNumber).flatMap (build) ->
-      sql = "SELECT * FROM models WHERE type = 'test' AND id LIKE '" + projectName + "-build-" + buildNumber + "-test-%'"
+      sql = "SELECT * FROM documents WHERE type = 'test' AND id LIKE '" + projectName + "-build-" + buildNumber + "-test-%'"
       Bacon.fromNodeCallback(db, "all", sql).flatMap(helpers.handleResultRows)
 
   findReferenceImageId = (projectName, testName) ->
-    sql = "SELECT * FROM models WHERE type = 'test' AND id LIKE '" + projectName + "-build-%-test-" + testName + "'"
+    sql = "SELECT * FROM documents WHERE type = 'test' AND id LIKE '" + projectName + "-build-%-test-" + testName + "'"
     Bacon.fromNodeCallback(db, "all", sql).flatMap(helpers.handleResultRows).map (rows) ->
       rows = _.sortBy(rows, 'buildNumber')
       ok = _.findLast rows, (row) ->
@@ -39,6 +39,7 @@ module.exports = (db) ->
       status: result
       created: new Date()
       type: "test"
+      end: null
       images: 
         original: originalImageId
         reference: referenceImageId
@@ -92,7 +93,7 @@ module.exports = (db) ->
 
     if _.contains(["original", "diff", "reference"], requestedImage)
       return helpers.getBuild(projectName, buildNumber).flatMap (build) ->
-        sql = "SELECT * FROM models WHERE type = 'test' AND id = '" + projectName + "-build-" + buildNumber + "-test-" + testName + "'"
+        sql = "SELECT * FROM documents WHERE type = 'test' AND id = '" + projectName + "-build-" + buildNumber + "-test-" + testName + "'"
         Bacon.fromNodeCallback(db, "get", sql).flatMap(helpers.handleResultRow).flatMap (test) ->
           Bacon.fromNodeCallback(db, "get", "SELECT * FROM attachments WHERE id=?", test.images[requestedImage])
           .flatMap (attachment) ->

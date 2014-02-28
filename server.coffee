@@ -23,7 +23,7 @@ initDatabase = (file) ->
   db = new sqlite3.Database(file)
   if !exists
     db.serialize () ->
-      db.run("CREATE TABLE models (id VARCHAR(255) NOT NULL PRIMARY KEY, type VARCHAR(255) NOT NULL, value TEXT)")
+      db.run("CREATE TABLE documents (id VARCHAR(255) NOT NULL PRIMARY KEY, type VARCHAR(255) NOT NULL, value TEXT)")
       db.run("CREATE TABLE attachments (id VARCHAR(255) NOT NULL PRIMARY KEY, type VARCHAR(255) NOT NULL, value BLOB)")
   db
 

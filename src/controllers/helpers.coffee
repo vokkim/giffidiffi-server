@@ -4,16 +4,16 @@ _ = require("lodash")
 module.exports = (db) ->
 
   getProject = (name) ->
-    sql = "SELECT * FROM models WHERE type = 'project' AND id='project-"+name+"'"
+    sql = "SELECT * FROM documents WHERE type = 'project' AND id='project-"+name+"'"
     Bacon.fromNodeCallback(db, "get", sql).flatMap(handleResultRow)
 
   getAllDocumentsByType = (type) ->
-    Bacon.fromNodeCallback(db, "all", "SELECT * FROM models WHERE type = ?", type).flatMap(handleResultRows)
+    Bacon.fromNodeCallback(db, "all", "SELECT * FROM documents WHERE type = ?", type).flatMap(handleResultRows)
 
   getBuild = (projectName, buildNumber) ->
     getProject(projectName).flatMap (project) ->
       id = projectName + "-build-" + buildNumber
-      Bacon.fromNodeCallback(db, "get", "SELECT * FROM models WHERE type = 'build' AND id=?", id).flatMap(handleResultRow)
+      Bacon.fromNodeCallback(db, "get", "SELECT * FROM documents WHERE type = 'build' AND id=?", id).flatMap(handleResultRow)
 
   handleResultRows = (rows) ->
     _.map(rows, (row) -> JSON.parse row.value)
@@ -24,7 +24,7 @@ module.exports = (db) ->
     JSON.parse row.value
 
   storeDocument = (doc) ->
-    Bacon.fromNodeCallback(db, "run", "INSERT INTO models (id, type, value) VALUES (?, ?, ?)", 
+    Bacon.fromNodeCallback(db, "run", "INSERT INTO documents (id, type, value) VALUES (?, ?, ?)", 
       doc.id, doc.type, JSON.stringify(doc)).map () -> doc
 
   storeAttachment = (attachment) ->

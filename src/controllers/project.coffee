@@ -13,18 +13,18 @@ module.exports = (db) ->
       displayName: request.body.displayName
       type: "project"
 
-    Bacon.fromNodeCallback(db, "run", "INSERT INTO models (id, type, value) VALUES (?, ?, ?)", 
+    Bacon.fromNodeCallback(db, "run", "INSERT INTO documents (id, type, value) VALUES (?, ?, ?)", 
       project.id, project.type, JSON.stringify(project))
 
   updateProject = (request) ->
     helpers.getProject(request.params.id).flatMap (res) ->
       project = _.merge(res, {displayName: request.body.displayName})
-      Bacon.fromNodeCallback(db, "run", "UPDATE models SET value=? WHERE id=?", 
+      Bacon.fromNodeCallback(db, "run", "UPDATE documents SET value=? WHERE id=?", 
         JSON.stringify(project), project.id)
 
   removeProject = (request) ->
     helpers.getProject(request.params.id).flatMap (project) ->
-      Bacon.fromNodeCallback(db, "run", "DELETE FROM models WHERE id=?", project.id)
+      Bacon.fromNodeCallback(db, "run", "DELETE FROM documents WHERE id=?", project.id)
 
   findProject = (request) ->
     helpers.getProject(request.params.id)

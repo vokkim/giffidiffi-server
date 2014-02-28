@@ -25,7 +25,7 @@ before (done) -> setTestAttachments(db)(done)
 setFixtures = (db) ->
   (done) ->
     inserts = _.map fixtures, (data) ->
-      Bacon.fromNodeCallback(db, "run", "INSERT INTO models (id, type, value) VALUES (?, ?, ?)", data.id, data.type, JSON.stringify(data))
+      Bacon.fromNodeCallback(db, "run", "INSERT INTO documents (id, type, value) VALUES (?, ?, ?)", data.id, data.type, JSON.stringify(data))
 
     Bacon.combineAsArray(inserts).onValue () -> done()
 
