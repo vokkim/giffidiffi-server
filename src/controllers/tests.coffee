@@ -55,9 +55,9 @@ module.exports = (db) ->
     testName = postData.testName
     helpers.getBuild(projectName, buildNumber).flatMap (build) ->
       if _.isEmpty(request.files) || !_.has(request.files, testName) 
-        return new Bacon.Error {status: 400, cause: "Missing upload?"}
+        return new Bacon.Error {status: 400, result: "Missing upload?"}
       if build.status != "created"
-        return new Bacon.Error {status: 409, cause: "Build already complete!"}
+        return new Bacon.Error {status: 409, result: "Build already complete!"}
 
       originalImageId = generateAttachmentId(projectName, buildNumber, testName, "original")
       Bacon.combineAsArray(parseUploadedImage(originalImageId, request.files[testName]), findReferenceImageId(projectName, testName)).flatMap (v) ->
@@ -74,7 +74,9 @@ module.exports = (db) ->
           if diffImageId
             streams.push(helpers.storeAttachment({id: diffImageId, type: "image/png", value: result.diffData }))
 
-          Bacon.combineAsArray(streams).map () -> result
+          Bacon.combineAsArray(streams).map () -> 
+            {status: result.result}
+            
 
   generateAttachmentId = (projectName, buildNumber, testName, imageType) ->
     projectName+"-build-"+buildNumber+"-test-"+testName+"-"+imageType
@@ -97,10 +99,10 @@ module.exports = (db) ->
         Bacon.fromNodeCallback(db, "get", "SELECT * FROM attachments WHERE id=?", test.images[requestedImage])
         .flatMap (attachment) ->
           if _.isEmpty(attachment)
-            return new Bacon.Error {cause: "No " + requestedImage + " image", status: 404}
-          { data: attachment.value, contentType: attachment.type }
+            return new Bacon.Error {result: "No " + requestedImage + " image", status: 404}
+          { result: attachment.value, contentType: attachment.type }
     else
-      return Bacon.once(new Bacon.Error {cause: "Unknown image type: " + requestedImage, status: 400})
+      return Bacon.once(new Bacon.Error {result: "Unknown image type: " + requestedImage, status: 400})
 
   api =
     createTests: runNewTest

@@ -24,7 +24,7 @@ module.exports = (db) ->
 
   handleResultRow = (row) ->
     if _.isEmpty(row)
-        return new Bacon.Error { cause: "Not found", status: 404 }
+        return new Bacon.Error { result: "Not found", status: 404 }
     JSON.parse row.value
 
   storeDocument = (doc) ->

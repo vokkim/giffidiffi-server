@@ -57,7 +57,7 @@ describe 'Testsuites', ->
         .attach('first_test', './test/new_first_test.png')
         .end (err, res) ->
           res.status.should.equal(200)
-          res.body.result.should.equal("success")
+          res.body.status.should.equal("success")
           done()
 
     it 'creates a new test without prior history, returns success', (done) ->   
@@ -66,7 +66,7 @@ describe 'Testsuites', ->
         .attach('third_test', './test/2_first_test.png')
         .end (err, res) ->
           res.status.should.equal(200)
-          res.body.result.should.equal("success")
+          res.body.status.should.equal("success")
           done()
 
     it 'does not allow to add tests to completed build', (done) ->   
@@ -86,7 +86,7 @@ describe 'Testsuites', ->
         .attach('second_test', './test/new_second_test.png')
         .end (err, res) ->
           res.status.should.equal(200)
-          res.body.result.should.equal("fail")
+          res.body.status.should.equal("fail")
           done()
 
     it 'returns correct original image for test', (done) ->   

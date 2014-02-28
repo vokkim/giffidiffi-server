@@ -33,32 +33,22 @@ setup = (app, controllers) ->
     requestStream.flatMap (val) ->
       controller(val.request())
       .map (result) ->
-        { response: val.response, result: result }
+        if _.has(result, 'result')
+          return { response: val.response, result: result.result, status: result.status, contentType: result.contentType }
+        else
+          return { response: val.response, result: result }
       .mapError (e) ->
-        #console.log "ERRR ", e, val.request().path
         if _.has e, 'status'
-          return { error: e, response: val.response }
-        code = if _.has(e, 'errno') then determineSqlErrorCode(e.errno) else 500
-        return { error: {status: code, cause: e}, response: val.response }
+          return { response: val.response, result: e.result, status: e.status }
+        else
+          code = if _.has(e, 'errno') then determineSqlErrorCode(e.errno) else 500
+          return { response: val.response, result: "Error", status: code  }
       
     .onValue (val) ->
-      if val.error
-        val.response().send val.error.status
-      else 
-        val.response().send val.result
+      status = if val.status then val.status else 200
+      contentType = if val.contentType then val.contentType else 'application/json'
+      val.response().status(status).type(contentType).send(val.result)
 
-  serveFile = (requestStream, controller) ->
-    requestStream.flatMap (val) ->
-      controller(val.request()).map (result) ->
-        { response: val.response, result: result }
-      .mapError (e) ->
-        #console.error "Error: ", e
-        { error: e, response: val.response }
-    .onValue (val) ->
-      if val.error
-        val.response().send val.error.status
-      else 
-        val.response().type(val.result.contentType).send(val.result.data)
 
   serveResource(router('get','/api/project'), controllers.project.findAllProjects)
   serveResource(router('post','/api/project'), controllers.project.createProject)
@@ -74,7 +64,7 @@ setup = (app, controllers) ->
   serveResource(router('get','/api/project/:project/build/:number/tests'), controllers.tests.findTests)
   serveResource(router('post','/api/project/:project/build/:number/done'), controllers.build.markAsDone)
   
-  serveFile(router('get','/api/project/:project/build/:number/tests/:test/:image'), controllers.tests.findTestImage)
+  serveResource(router('get','/api/project/:project/build/:number/tests/:test/:image'), controllers.tests.findTestImage)
 
 
 exports.setup = setup
