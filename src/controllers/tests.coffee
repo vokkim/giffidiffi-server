@@ -54,6 +54,9 @@ module.exports = (db) ->
     helpers.getBuild(projectName, buildNumber).flatMap (build) ->
       if _.isEmpty(request.files) || !_.has(request.files, testName) 
         return new Bacon.Error {status: 400, cause: "Missing upload?"}
+      if build.status != "created"
+        return new Bacon.Error {status: 409, cause: "Build already complete!"}
+
       originalImageId = generateAttachmentId(projectName, buildNumber, testName, "original")
       Bacon.combineAsArray(parseUploadedImage(originalImageId, request.files[testName]), findReferenceImageId(projectName, testName)).flatMap (v) ->
 

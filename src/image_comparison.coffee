@@ -24,7 +24,7 @@ compareImages = (originalImage, referenceImage) ->
 removeTempFiles = () ->
   _.forIn arguments, (file) ->
     Bacon.fromNodeCallback(fs.unlink, file).onError (e)->
-      console.error "Unable to remove temp file "+file
+      console.error "Unable to remove temp file: ", file
 
 compareImageFiles = (fileA, fileB) ->
   # Use Bacon.Bus to hack the gm.compare, Bacon.fromCallback did not seem to work properly for some reason?

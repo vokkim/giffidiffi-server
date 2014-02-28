@@ -47,18 +47,26 @@ describe 'Testsuites', ->
     request(url).get('/api/project/testproject/build/2/tests/first_test/asd').end (err, res) ->
       res.status.should.equal(400)
       done()
+
     
   describe 'Adding new test', ()->
 
     it 'creates new test and returns success', (done) ->   
       data = { testName: "first_test" }
-      request(url).post('/api/project/testproject/build/3/tests')
-        .field('data', JSON.stringify(data))
+      request(url).post('/api/project/testproject/build/3/tests').field('data', JSON.stringify(data))
         .attach('first_test', './test/new_first_test.png')
         .end (err, res) ->
           res.status.should.equal(200)
           res.body.result.should.equal("success")
           done()
+
+   it 'does not allow to add tests to completed build ', (done) ->   
+    data = { testName: "new_test" }
+    request(url).post('/api/project/testproject/build/2/tests').field('data', JSON.stringify(data))
+      .attach('new_test', './test/new_first_test.png')
+      .end (err, res) ->
+        res.status.should.equal(409)
+        done()
 
   describe 'Adding new (failing) test', ()->
 
