@@ -19,8 +19,7 @@ module.exports = (db) ->
   updateProject = (request) ->
     helpers.getProject(request.params.id).flatMap (res) ->
       project = _.merge(res, {displayName: request.body.displayName})
-      Bacon.fromNodeCallback(db, "run", "UPDATE documents SET value=? WHERE id=?", 
-        JSON.stringify(project), project.id)
+      helpers.updateDocument(project)
 
   removeProject = (request) ->
     helpers.getProject(request.params.id).flatMap (project) ->

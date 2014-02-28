@@ -18,7 +18,7 @@
   "status": "success",
   "start": "2014-02-24T11:09:11.222Z",
   "end": "2014-02-24T11:09:30.222Z",
-  "tests": ["testproject-build-1-test-first_test", "testproject-build-1-test-second_test"]
+  "tests": ["first_test", "second_test"]
 },
 {
   "id": "testproject-build-2",
@@ -28,7 +28,7 @@
   "status": "fail",
   "start": "2014-02-24T11:11:11.222Z",
   "end": "2014-02-24T11:15:05.222Z",
-  "tests": ["testproject-build-2-test-first_test", "testproject-build-2-test-second_test"]
+  "tests": ["first_test", "second_test"]
 },
 {
   "id": "testproject-build-1-test-first_test",

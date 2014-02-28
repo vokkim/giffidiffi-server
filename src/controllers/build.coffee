@@ -21,12 +21,29 @@ module.exports = (db) ->
         buildNumber: buildNumber
         status: "created"
         start: new Date()
+        end: null
         tests: []
         type: "build"
       
       Bacon.fromNodeCallback(db, "run", "INSERT INTO documents (id, type, value) VALUES (?, ?, ?)", 
         build.id, build.type, JSON.stringify(build))
 
+  markAsDone = (request) ->
+    helpers.getBuild(request.params.project, request.params.number).flatMap (build) ->
+      if build.status != "created"
+        return new Bacon.Error {status: 400, cause: "Build already final"}
+      testResults = _.map build.tests, (testName) ->
+        helpers.getTest(build.project, build.buildNumber, testName).map (test) ->
+          test.status
+
+      Bacon.combineAsArray(testResults).flatMap (results)-> 
+        successful = _.every results, (result) ->
+          result == "success"
+        build.end = new Date()
+        build.status = if successful then "success" else "fail"
+        helpers.updateDocument(build)
+      .flatMap () ->
+        build
 
   findBuild = (request) ->
     helpers.getBuild(request.params.project, request.params.number)
@@ -38,4 +55,5 @@ module.exports = (db) ->
     createBuild: createBuild
     findBuild: findBuild
     findAllBuilds: findAllBuilds
+    markAsDone: markAsDone
 

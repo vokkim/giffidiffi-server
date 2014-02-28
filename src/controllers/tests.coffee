@@ -30,22 +30,23 @@ module.exports = (db) ->
     Bacon.fromNodeCallback(db, "get", "SELECT * FROM attachments WHERE id=?", referenceImageId).flatMap (referenceImage) ->
       imageComparison(originalImage, referenceImage)
 
-  createTest = (projectName, buildNumber, testName, result, originalImageId, referenceImageId, diffImageId) ->
+  createTest = (build, testName, result, originalImageId, referenceImageId, diffImageId) ->
     test = 
-      id: projectName+"-build-"+buildNumber+"-test-"+testName
-      project: projectName
-      buildNumber: buildNumber
+      id: build.project + "-build-" + build.buildNumber + "-test-" + testName
+      project: build.project
+      buildNumber: build.buildNumber
       testName: testName
       status: result
       created: new Date()
       type: "test"
-      end: null
       images: 
         original: originalImageId
         reference: referenceImageId
         diff: diffImageId
 
-    helpers.storeDocument(test)
+    build.tests.push(testName)
+    helpers.storeDocument(test).flatMap () ->
+      helpers.updateDocument(build)
 
   runNewTest = (request) ->
     projectName = request.params.project
@@ -67,7 +68,7 @@ module.exports = (db) ->
         resultS.flatMap (result) ->
           diffImageId = if result.diffData then generateAttachmentId(projectName, buildNumber, testName, "diff") else null
 
-          streams = [createTest(projectName, buildNumber, testName, result.result, originalImage.id, referenceImageId, diffImageId),
+          streams = [createTest(build, testName, result.result, originalImage.id, referenceImageId, diffImageId),
                      helpers.storeAttachment(originalImage)]
 
           if diffImageId
@@ -92,14 +93,12 @@ module.exports = (db) ->
     requestedImage = request.params.image
 
     if _.contains(["original", "diff", "reference"], requestedImage)
-      return helpers.getBuild(projectName, buildNumber).flatMap (build) ->
-        sql = "SELECT * FROM documents WHERE type = 'test' AND id = '" + projectName + "-build-" + buildNumber + "-test-" + testName + "'"
-        Bacon.fromNodeCallback(db, "get", sql).flatMap(helpers.handleResultRow).flatMap (test) ->
-          Bacon.fromNodeCallback(db, "get", "SELECT * FROM attachments WHERE id=?", test.images[requestedImage])
-          .flatMap (attachment) ->
-            if _.isEmpty(attachment)
-              return new Bacon.Error {cause: "No " + requestedImage + " image", status: 404}
-            { data: attachment.value, contentType: attachment.type }
+      return helpers.getTest(projectName, buildNumber, testName).flatMap (test) ->
+        Bacon.fromNodeCallback(db, "get", "SELECT * FROM attachments WHERE id=?", test.images[requestedImage])
+        .flatMap (attachment) ->
+          if _.isEmpty(attachment)
+            return new Bacon.Error {cause: "No " + requestedImage + " image", status: 404}
+          { data: attachment.value, contentType: attachment.type }
     else
       return Bacon.once(new Bacon.Error {cause: "Unknown image type: " + requestedImage, status: 400})
 

@@ -60,7 +60,7 @@ describe 'Testsuites', ->
           res.body.result.should.equal("success")
           done()
 
-   it 'does not allow to add tests to completed build ', (done) ->   
+   it 'does not allow to add tests to completed build', (done) ->   
     data = { testName: "new_test" }
     request(url).post('/api/project/testproject/build/2/tests').field('data', JSON.stringify(data))
       .attach('new_test', './test/new_first_test.png')
@@ -95,6 +95,17 @@ describe 'Testsuites', ->
         res.status.should.equal(200)
         res.type.should.equal("image/png")
         res.header['content-length'].should.above(10000)
+        done()
+
+  describe 'Mark suite as completed', ()->
+
+    it 'returns the build data with correct result and tests', (done) ->   
+      data = { testName: "first_test" }
+      request(url).post('/api/project/testproject/build/3/done').end (err, res) ->
+        res.status.should.equal(200)
+        res.body.status.should.equal("fail")
+        res.body.tests.should.containDeep(["first_test", "second_test"])
+        res.body.end.should.be.ok
         done()
 
 

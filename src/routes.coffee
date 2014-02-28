@@ -71,6 +71,7 @@ setup = (app, controllers) ->
 
   serveResource(router('post','/api/project/:project/build/:number/tests', express.multipart()), controllers.tests.createTests)
   serveResource(router('get','/api/project/:project/build/:number/tests'), controllers.tests.findTests)
+  serveResource(router('post','/api/project/:project/build/:number/done'), controllers.build.markAsDone)
   
   serveFile(router('get','/api/project/:project/build/:number/tests/:test/:image'), controllers.tests.findTestOriginalImage)
 
