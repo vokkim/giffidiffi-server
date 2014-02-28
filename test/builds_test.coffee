@@ -12,7 +12,7 @@ describe 'Build', ->
   it 'returns all builds for testproject', (done) ->   
     request(url).get('/api/project/testproject/build').end (err, res) ->
       res.status.should.equal(200)
-      res.body.length.should.equal(2)
+      res.body.length.should.equal(3)
       _.each res.body, (build)->
         build.type.should.equal("build")
         build.project.should.equal("testproject")
@@ -31,15 +31,12 @@ describe 'Build', ->
       done()  
 
   describe 'CRUD operations', ()->
-    before (done) ->
-      request(url).post('/api/project/testproject/build').end (err, res) -> 
-        done()
-
+      
     it 'creates new Build with incremental Build ID', (done) ->   
-        request(url).get('/api/project/testproject/build/3').end (err, res) ->
-          res.status.should.equal(200)
-          res.body.project.should.equal('testproject')
-          res.body.status.should.equal('created')
-          res.body.buildNumber.should.equal(3)
-          res.body.tests.should.be.empty
-          done()
+      request(url).post('/api/project/testproject/build').end (err, res) -> 
+        res.status.should.equal(200)
+        res.body.project.should.equal('testproject')
+        res.body.status.should.equal('created')
+        res.body.buildNumber.should.equal(4)
+        res.body.tests.should.be.empty
+        done()

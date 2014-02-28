@@ -108,6 +108,12 @@ describe 'Testsuites', ->
         res.body.end.should.be.ok
         done()
 
+    it 'does not allow to mark already completed build', (done) ->   
+      data = { testName: "first_test" }
+      request(url).post('/api/project/testproject/build/2/done').end (err, res) ->
+        res.status.should.equal(400)
+        done()
+
 
 imageParser = (res, callback) ->
     res.setEncoding('binary')

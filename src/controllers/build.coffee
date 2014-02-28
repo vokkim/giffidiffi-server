@@ -27,6 +27,8 @@ module.exports = (db) ->
       
       Bacon.fromNodeCallback(db, "run", "INSERT INTO documents (id, type, value) VALUES (?, ?, ?)", 
         build.id, build.type, JSON.stringify(build))
+      .flatMap () ->
+        build
 
   markAsDone = (request) ->
     helpers.getBuild(request.params.project, request.params.number).flatMap (build) ->
