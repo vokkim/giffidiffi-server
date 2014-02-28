@@ -41,7 +41,6 @@ setup = (app, controllers) ->
         else
           code = if _.has(e, 'errno') then determineSqlErrorCode(e.errno) else 500
           return { response: val.response, result: "Error", status: code  }
-      
     .onValue (val) ->
       status = if val.status then val.status else 200
       contentType = if val.contentType then val.contentType else 'application/json'
@@ -61,7 +60,9 @@ setup = (app, controllers) ->
   serveResource(router('post','/api/project/:project/build/:number/tests'), controllers.tests.createTests)
   serveResource(router('get','/api/project/:project/build/:number/tests'), controllers.tests.findTests)
   serveResource(router('post','/api/project/:project/build/:number/done'), controllers.build.markAsDone)
-  
+
+  serveResource(router('post','/api/project/:project/build/:number/tests/:test/bad'), controllers.tests.markAsBad)
+  serveResource(router('post','/api/project/:project/build/:number/tests/:test/good'), controllers.tests.markAsGood)
   serveResource(router('get','/api/project/:project/build/:number/tests/:test/:image'), controllers.tests.findTestImage)
 
 

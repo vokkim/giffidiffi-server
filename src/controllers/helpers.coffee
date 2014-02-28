@@ -19,6 +19,20 @@ module.exports = (db) ->
     sql = "SELECT * FROM documents WHERE type = 'test' AND id='" + projectName + "-build-" + buildNumber + "-test-" + testName + "'"
     Bacon.fromNodeCallback(db, "get", sql).flatMap(handleResultRow)
 
+  updateBuildStatus = (build) ->
+    testResults = _.map build.tests, (testName) ->
+        getTest(build.project, build.buildNumber, testName).map (test) ->
+          test.status
+
+      Bacon.combineAsArray(testResults).flatMap (results)-> 
+        successful = _.every results, (result) ->
+          _.contains(["success", "good"], result)
+        build.end = new Date()
+        build.status = if successful then "success" else "fail"
+        updateDocument(build)
+      .flatMap () ->
+        build
+
   handleResultRows = (rows) ->
     _.map(rows, (row) -> JSON.parse row.value)
 
@@ -49,3 +63,4 @@ module.exports = (db) ->
     storeDocument: storeDocument
     updateDocument: updateDocument
     storeAttachment: storeAttachment
+    updateBuildStatus: updateBuildStatus

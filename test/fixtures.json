@@ -11,6 +11,30 @@
   "displayName": "My Project"
 },
 {
+  "id": "myproject-build-1",
+  "type": "build",
+  "project": "myproject",
+  "buildNumber": 1,
+  "status": "created",
+  "start": "2014-02-24T11:11:11.222Z",
+  "end": null,
+  "tests": ["myproject_test"]
+},
+{
+  "id": "myproject-build-1-test-myproject_test",
+  "type": "test",
+  "project": "myproject",
+  "testName": "myproject_test",
+  "buildNumber": 1,
+  "status": "fail",
+  "created": "2014-02-24T12:09:11.222Z",
+  "images": {
+    "original": "testproject-build-1-test-first_test-original",
+    "reference": null,
+    "diff": null
+  }
+},
+{
   "id": "testproject-build-1",
   "type": "build",
   "project": "testproject",

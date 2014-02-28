@@ -123,6 +123,36 @@ describe 'Testsuites', ->
         res.status.should.equal(400)
         done()
 
+  describe 'Mark individual test as good', ()->
+
+    before (done) ->
+      request(url).post('/api/project/testproject/build/3/tests/second_test/good').expect(200).end (err, res)->
+        if err then throw err
+        done()
+
+    it 'updates build status to success', (done) ->   
+      request(url).get('/api/project/testproject/build/3').end (err, res) -> 
+        res.status.should.equal(200)
+        res.body.status.should.equal("success")
+        done()
+
+    it 'does not allow to mark tests if the build is incomplete', (done) ->   
+      request(url).post('/api/project/myproject/build/1/tests/myproject_test/good').end (err, res) -> 
+        res.status.should.equal(409)
+        done()
+
+  describe 'Mark test as bad', ()->
+
+    before (done) ->
+      request(url).post('/api/project/testproject/build/1/tests/second_test/bad').expect(200).end (err, res)->
+        if err then throw err
+        done()
+
+    it 'updates build status to fail', (done) ->   
+      request(url).get('/api/project/testproject/build/1').end (err, res) -> 
+        res.status.should.equal(200)
+        res.body.status.should.equal("fail")
+        done()
 
 imageParser = (res, callback) ->
     res.setEncoding('binary')

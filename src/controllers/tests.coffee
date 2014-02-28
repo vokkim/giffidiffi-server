@@ -78,6 +78,28 @@ module.exports = (db) ->
             {status: result.result}
             
 
+  markAsBad = (request) ->
+    projectName = request.params.project
+    buildNumber = parseInt(request.params.number)
+    testName = request.params.test
+    markTestAs(projectName, buildNumber, testName, "bad")
+
+  markAsGood = (request) ->
+    projectName = request.params.project
+    buildNumber = parseInt(request.params.number)
+    testName = request.params.test
+    markTestAs(projectName, buildNumber, testName, "good")
+
+  markTestAs = (projectName, buildNumber, testName, status) ->
+    helpers.getBuild(projectName, buildNumber).flatMap (build) ->
+      if build.status == "created"
+        return new Bacon.Error {status: 409, result: "Can not mark tests for incomplete build!"}
+      helpers.getTest(projectName, buildNumber, testName).flatMap (test) ->
+        test.status = status
+        helpers.updateDocument(test)
+      .flatMap () -> 
+        helpers.updateBuildStatus(build)
+
   generateAttachmentId = (projectName, buildNumber, testName, imageType) ->
     projectName+"-build-"+buildNumber+"-test-"+testName+"-"+imageType
 
@@ -108,4 +130,6 @@ module.exports = (db) ->
     createTests: runNewTest
     findTests: findTests
     findTestImage: findTestImage
+    markAsGood: markAsGood
+    markAsBad: markAsBad
 

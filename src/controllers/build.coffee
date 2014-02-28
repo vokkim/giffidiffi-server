@@ -34,19 +34,8 @@ module.exports = (db) ->
     helpers.getBuild(request.params.project, request.params.number).flatMap (build) ->
       if build.status != "created"
         return new Bacon.Error {status: 400, result: "Build already complete!"}
-      testResults = _.map build.tests, (testName) ->
-        helpers.getTest(build.project, build.buildNumber, testName).map (test) ->
-          test.status
-
-      Bacon.combineAsArray(testResults).flatMap (results)-> 
-        successful = _.every results, (result) ->
-          result == "success"
-        build.end = new Date()
-        build.status = if successful then "success" else "fail"
-        helpers.updateDocument(build)
-      .flatMap () ->
-        build
-
+      helpers.updateBuildStatus(build)
+  
   findBuild = (request) ->
     helpers.getBuild(request.params.project, request.params.number)
 
