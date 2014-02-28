@@ -13,10 +13,18 @@ compareImages = (originalImage, referenceImage) ->
   originalTempFile = createTempFile(originalImage.value)
   referenceTempFile = createTempFile(referenceImage.value)
   compareImageFiles(originalTempFile, referenceTempFile).flatMap (result) ->
+    diff = Bacon.fromNodeCallback(fs.readFile, result.diff)
+    diff.onEnd () ->
+      removeTempFiles(originalTempFile, referenceTempFile, result.diff)
     Bacon.combineTemplate {
       result: if result.isEqual then "success" else "fail"
-      diffData: Bacon.fromNodeCallback(fs.readFile, result.diff)
+      diffData: diff
     }
+
+removeTempFiles = () ->
+  _.forIn arguments, (file) ->
+    Bacon.fromNodeCallback(fs.unlink, file).onError (e)->
+      console.error "Unable to remove temp file "+file
 
 compareImageFiles = (fileA, fileB) ->
   # Use Bacon.Bus to hack the gm.compare, Bacon.fromCallback did not seem to work properly for some reason?
