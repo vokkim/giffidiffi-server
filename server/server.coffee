@@ -10,8 +10,8 @@ initExpressApplication = () ->
   app.use express.json()
   app.use express.urlencoded()
   app.use express.multipart()
-  
-  app.use(express.static(__dirname + '/public'));
+
+  app.use(express.static(__dirname + './../dist'))
 
   app.configure 'development', () ->
     app.use express.errorHandler({ dumpExceptions: true, showStack: true })
