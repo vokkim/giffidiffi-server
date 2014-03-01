@@ -2,8 +2,8 @@ express = require("express")
 sqlite3 = require("sqlite3")
 fs = require('fs')
 
-controllers = require("./src/controllers")
-routes = require("./src/routes")
+controllers = require("./controllers")
+routes = require("./routes")
 
 initExpressApplication = () ->
   app = express()
