@@ -1,2 +1,6 @@
 node_modules/
 *.db
+.tmp/
+.sass-cache/
+dist/
+app/components/
