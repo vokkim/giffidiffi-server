@@ -10,6 +10,9 @@ requirejs.config
 		'handlebars':
 		  deps: ['lodash', 'jquery']
 			exports: 'Handlebars'
+		'simrou':
+		  deps: ['jquery']
+			exports: 'Simrou'
 
 		'bootstrap-affix': 		{ deps: ['jquery'], exports: '$' }
 		'bootstrap-alert': 		{ deps: ['jquery'], exports: '$' }
@@ -34,6 +37,7 @@ requirejs.config
 		'bacon': '../components/bacon/dist/bacon'
 		'bacon.jquery': '../components/bacon.jquery/dist/bacon.jquery'
 		'handlebars': '../components/handlebars/dist/handlebars'
+		'simrou': '../components/simrou/build/simrou'
 		'text' : '../components/requirejs-text/text'
 		'templates': '../templates'
 

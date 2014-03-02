@@ -9,7 +9,8 @@
     "requirejs-text": "~2.0.5",
     "bacon": "0.7.6",
     "bacon.jquery": "0.3.14",
-    "handlebars": "git://github.com/wycats/handlebars.js.git#v1.0.12"
+    "handlebars": "git://github.com/wycats/handlebars.js.git#v1.0.12",
+    "simrou": "git://github.com/buero-fuer-ideen/Simrou.git#v1.5.2"
   },
   "devDependencies": {
   }

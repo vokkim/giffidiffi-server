@@ -4,4 +4,5 @@ define [
   'bacon'
   'bacon.jquery'
   'handlebars'
+  'simrou'
 ], ()->
