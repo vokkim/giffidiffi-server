@@ -63,6 +63,7 @@ module.exports = (grunt)->
   yeomanConfig = {
     app: 'app'
     src: 'app'
+    server: 'server'
     dist: 'dist'
 
     tmp: '.tmp'
@@ -88,9 +89,11 @@ module.exports = (grunt)->
     watch:
       options:
         interrupt: true
+        options:
+          livereload: yeomanConfig.livereload_port
 
       coffee:
-        files: ['<%= yeoman.src %>/coffee/{,**/}*.coffee']
+        files: ['<%= yeoman.app %>/coffee/{,**/}*.coffee']
         tasks: ['coffee:dist']
       
       compass:
@@ -108,13 +111,11 @@ module.exports = (grunt)->
           '<%= yeoman.tmp %>/{,**/}*.{css,js}'
           '<%= yeoman.app %>/{,**/}*.html'
           '<%= yeoman.app %>/css/{,**/}*.css'
-          '<%= yeoman.app %>/js/{,**/}*.js'
+          '<%= yeoman.app %>/coffee/{,**/}*.coffee'
           '<%= yeoman.app %>/images/{,**/}*.{png,jpg,jpeg}'
           '!<%= yeoman.app %>/components/**'
         ]
         tasks: []
-        options:
-          livereload: yeomanConfig.livereload_port
 
     express: 
       options: 

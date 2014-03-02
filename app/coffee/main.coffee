@@ -7,6 +7,9 @@ requirejs.config
 			exports: '$'
 		'bacon':
 			exports: 'Bacon'
+		'handlebars':
+		  deps: ['lodash', 'jquery']
+			exports: 'Handlebars'
 
 		'bootstrap-affix': 		{ deps: ['jquery'], exports: '$' }
 		'bootstrap-alert': 		{ deps: ['jquery'], exports: '$' }
@@ -30,6 +33,7 @@ requirejs.config
 		'jquery': '../components/jquery/jquery'
 		'bacon': '../components/bacon/dist/bacon'
 		'bacon.jquery': '../components/bacon.jquery/dist/bacon.jquery'
+		'handlebars': '../components/handlebars/dist/handlebars'
 		'templates': 	'../templates'
 
 		'bootstrap-affix': 		'../components/bootstrap/js/bootstrap-affix'

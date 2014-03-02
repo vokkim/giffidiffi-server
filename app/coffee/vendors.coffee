@@ -3,4 +3,5 @@ define [
 	'jquery'
   'bacon'
   'bacon.jquery'
+  'handlebars'
 ], ()->
