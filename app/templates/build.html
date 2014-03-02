@@ -1,20 +1,28 @@
 
-<h1>Project: {{project.displayName}} - build #{{build.buildNumber}}</h1>
+<h1>
+  <small>Project: {{project.displayName}}</small><br/>
+  Build #{{build.buildNumber}}
+</h1>
 
-<table class="table">
-  <thead>
-    <tr>
-      <th>Tests</th>
-    </tr>
-  </thead>
-  <tbody>
-    {{#each tests}}
-    <tr>
-      <td><a href="#!/{{../project.name}}/{{buildNumber}}/">{{testName}}</a></td>
-      <td>{{status}}</td>
-      <td>{{start}}</td>
-      <td>{{created}}</td>
-    </tr>
-    {{/each}}
-  </tbody>
-</table>
+
+<div class="header">
+  <div class="row">
+    <div class="col-md-8">.col-md-8</div>
+    <div class="col-md-4">.col-md-4</div>
+  </div>
+</div>
+<div class="tests">
+{{#each tests}}
+  <div class="row">
+    <div class="col-md-1">
+      <div class="status {{status}}">
+        <span class="glyphicon glyphicon-ok"></span>
+      </div>
+    </div>
+    <div class="col-md-5">{{testName}}</div>
+    <div class="col-md-2">Thumbnail-captured</div>
+    <div class="col-md-2">Thumbnail-diff</div>
+    <div class="col-md-2">Thumbnail-reference</div>
+  </div>
+{{/each}}
+</div>

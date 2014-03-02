@@ -44,7 +44,6 @@ module.exports = (grunt)->
 
   grunt.loadNpmTasks('grunt-contrib-clean')
   grunt.loadNpmTasks('grunt-contrib-coffee')
-  grunt.loadNpmTasks('grunt-contrib-compass')
   grunt.loadNpmTasks('grunt-contrib-less')
   grunt.loadNpmTasks('grunt-contrib-concat')
   grunt.loadNpmTasks('grunt-contrib-copy')
@@ -95,9 +94,9 @@ module.exports = (grunt)->
         files: ['<%= yeoman.app %>/coffee/{,**/}*.coffee']
         tasks: ['coffee:dist']
       
-      compass:
-        files: ['<%= yeoman.src %>/sass/{,**/}*.{scss,sass}']
-        tasks: ['compass:server']
+      less:
+        files: ['<%= yeoman.src %>/less/{,**/}*.less']
+        tasks: ['less:server']
 
       express:
         files:  [ '<%= yeoman.server %>/{,**/}*.coffee' ]
@@ -156,43 +155,24 @@ module.exports = (grunt)->
         src: '<%= yeoman.src %>/coffee/app'
         dest: '<%= yeoman.tmp %>/js/app'
 
-    compass:
-      options:
-        sassDir: '<%= yeoman.src %>/sass'
-        cssDir: '<%= yeoman.tmp %>/css'
-        imagesDir: '<%= yeoman.app %>/images'
-        javascriptsDir: '<%= yeoman.app %>/js'
-        fontsDir: './css/fonts'
-        importPath: ['<%= yeoman.app %>/components']
-        relativeAssets: true
-
-      dist: 
-        options:
-          force: true
-          outputStyle: 'compressed'
-          environment: 'production'
-      server:
-        options:
-          debugInfo: true
-
     less:
       server:
         options:
           dumpLineNumbers: 'all'
         files:
-            '<%= yeoman.tmp %>/css/all-less.css' : '<%= yeoman.app %>/components/bootstrap/less/{bootstrap,responsive}.less'
+            '<%= yeoman.tmp %>/css/all-less.css' : '<%= yeoman.app %>/less/bootstrap.less'
 
       dist:
         options:
           compress: true
           yuicompress: true
         files:
-            '<%= yeoman.tmp %>/css/all-less.css' : '<%= yeoman.app %>/components/bootstrap/less/{bootstrap,responsive}.less'
+            '<%= yeoman.tmp %>/css/all-less.css' : '<%= yeoman.app %>/less/bootstrap.less'
 
     copy:
       dist:
         files: [
-          { expand: true, cwd: '<%= yeoman.app %>/components', src: ['**'], dest: '<%= yeoman.dist %>/components' }
+          { expand: true, cwd: '<%= yeoman.tmp %>/components', src: ['**'], dest: '<%= yeoman.dist %>/components' }
           { expand: true, cwd: '<%= yeoman.tmp %>/', src: ['**'], dest: '<%= yeoman.tmp_dist %>/' }
           { expand: true, cwd: '<%= yeoman.app %>/', src: ['**'], dest: '<%= yeoman.tmp_dist %>/' }
         ]
@@ -262,7 +242,6 @@ module.exports = (grunt)->
 
   grunt.registerTask('server', [
     'coffee:dist'
-    'compass:server'
     'less:server'
     'express:server'
     'open:server'
@@ -278,7 +257,7 @@ module.exports = (grunt)->
 
   grunt.registerTask('compile', [
     'coffee:dist'
-    'compass:server'
+    'less:server'
     'less:dist'
   ])
 
@@ -287,7 +266,6 @@ module.exports = (grunt)->
     'clean:tmp'
     'clean:tmp_dist'
     'coffee'
-    'compass:dist'
     'less:dist'
     'copy:dist'
     'requirejs:compile'
