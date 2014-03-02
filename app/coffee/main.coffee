@@ -14,6 +14,10 @@ requirejs.config
 			deps: ['jquery']
 			exports: 'Simrou'
 
+		'lazyload':
+			deps: ['jquery']
+			exports: '$'
+
 		'bootstrap-affix': 		{ deps: ['jquery'], exports: '$' }
 		'bootstrap-alert': 		{ deps: ['jquery'], exports: '$' }
 		'bootstrap-button': 	{ deps: ['jquery'], exports: '$' }
@@ -39,6 +43,7 @@ requirejs.config
 		'handlebars': '../components/handlebars/dist/handlebars'
 		'simrou': '../components/simrou/build/simrou'
 		'text' : '../components/requirejs-text/text'
+		'lazyload' : '../components/jquery.lazyload/jquery.lazyload'
 		'templates': '../templates'
 
 		'bootstrap-affix': 		'../components/bootstrap/js/bootstrap-affix'
@@ -58,6 +63,7 @@ requirejs.config
 require [
   'lodash'
   'jquery'
+  'lazyload'
   'bacon'
   'bacon.jquery'
   'handlebars'

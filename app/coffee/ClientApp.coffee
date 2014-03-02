@@ -26,6 +26,7 @@ define ['Router', 'text!templates/app.html', 'text!templates/project.html', 'tex
       tests = resp[2]
       element = Handlebars.compile(buildTemplate)({project: project, build: build, tests: tests})
       $('#content').html(element)
+      $("img.lazy").lazyload()
 
   router = Router({
     '!/:project/:build': BuildController

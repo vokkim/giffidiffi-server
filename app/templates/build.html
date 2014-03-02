@@ -19,9 +19,15 @@
       </h3>
       <small>{{created}}</small>
     </div>
-    <div class="col-md-2"> <img src="/api/project/{{../project.name}}/build/{{../build.buildNumber}}/tests/{{testName}}/original"> </div>
-    <div class="col-md-2"> <img src="/api/project/{{../project.name}}/build/{{../build.buildNumber}}/tests/{{testName}}/diff"> </div>
-    <div class="col-md-2"> <img src="/api/project/{{../project.name}}/build/{{../build.buildNumber}}/tests/{{testName}}/reference"> </div>
+    <div class="col-md-2"> 
+      <img class="lazy" data-original="/api/project/{{../project.name}}/build/{{../build.buildNumber}}/tests/{{testName}}/original">
+    </div>
+    <div class="col-md-2">
+      <img class="lazy" data-original="/api/project/{{../project.name}}/build/{{../build.buildNumber}}/tests/{{testName}}/diff">
+    </div>
+    <div class="col-md-2"> 
+      <img class="lazy" data-original="/api/project/{{../project.name}}/build/{{../build.buildNumber}}/tests/{{testName}}/reference">
+    </div>
   </div>
 {{/each}}
 </div>
