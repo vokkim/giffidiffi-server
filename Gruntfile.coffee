@@ -89,8 +89,7 @@ module.exports = (grunt)->
     watch:
       options:
         interrupt: true
-        options:
-          livereload: yeomanConfig.livereload_port
+        livereload: yeomanConfig.livereload_port
 
       coffee:
         files: ['<%= yeoman.app %>/coffee/{,**/}*.coffee']

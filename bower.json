@@ -6,6 +6,7 @@
     "requirejs": "*",
     "bootstrap": "~2.3.2",
     "lodash": "~2.4.1",
+    "requirejs-text": "~2.0.5",
     "bacon": "0.7.6",
     "bacon.jquery": "0.3.14",
     "handlebars": "git://github.com/wycats/handlebars.js.git#v1.0.12"

@@ -34,7 +34,8 @@ requirejs.config
 		'bacon': '../components/bacon/dist/bacon'
 		'bacon.jquery': '../components/bacon.jquery/dist/bacon.jquery'
 		'handlebars': '../components/handlebars/dist/handlebars'
-		'templates': 	'../templates'
+		'text' : '../components/requirejs-text/text'
+		'templates': '../templates'
 
 		'bootstrap-affix': 		'../components/bootstrap/js/bootstrap-affix'
 		'bootstrap-alert': 		'../components/bootstrap/js/bootstrap-alert'
