@@ -1,2 +1,8 @@
 node_modules/
 *.db
+.tmp/
+.sass-cache/
+dist/
+app/components/
+.tmp-dist/
+npm-debug.log

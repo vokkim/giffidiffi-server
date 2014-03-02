@@ -1,4 +1,7 @@
-config = require('./config')
-server = require('./server')
+server = require('./server/server')
  
+config = 
+  dbfile: process.env.DBFILE || "./giffidiffi-test.db" 
+  port: process.env.PORT || 3000
+
 server(config)

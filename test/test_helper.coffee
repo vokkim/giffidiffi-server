@@ -8,7 +8,7 @@ config =
   dbfile: ":memory:"
   port: 3333
 
-server = require('../server')(config)
+server = require('../server/server')(config)
 
 module.exports.url = "http://localhost:3333"
 db = server.db

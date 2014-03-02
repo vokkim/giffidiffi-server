@@ -2,8 +2,8 @@ express = require("express")
 sqlite3 = require("sqlite3")
 fs = require('fs')
 
-controllers = require("./src/controllers")
-routes = require("./src/routes")
+controllers = require("./controllers")
+routes = require("./routes")
 
 initExpressApplication = () ->
   app = express()
@@ -14,9 +14,12 @@ initExpressApplication = () ->
   app.use(express.static(__dirname + '/public'));
 
   app.configure 'development', () ->
+    app.use(express.static(__dirname + './../.tmp'));
+    app.use(express.static(__dirname + './../app'));
     app.use express.errorHandler({ dumpExceptions: true, showStack: true })
-
+   
   app.configure 'production', () ->
+    app.use(express.static(__dirname + './../dist'))
     app.use express.errorHandler()
   app
 
