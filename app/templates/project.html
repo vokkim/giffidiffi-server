@@ -1,0 +1,21 @@
+
+<h1>Project: {{project.displayName}}</h1>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Builds</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each builds}}
+  
+    <tr>
+      <td><a href="#!/{{../project.name}}/{{buildNumber}}/">{{buildNumber}}</a></td>
+      <td>{{status}}</td>
+      <td>{{start}}</td>
+      <td>{{tests.length}}</td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>

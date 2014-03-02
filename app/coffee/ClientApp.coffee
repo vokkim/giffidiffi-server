@@ -1,20 +1,44 @@
-define ['Router', 'text!templates/app.html'], (Router, template)->
-  console.log "JQUERY ", $.fn.jquery
-  console.log "Lodash", _.VERSION
-  console.log "Bacon", Bacon.version
-  console.log "Handlers", Handlebars.VERSION
+define ['Router', 'text!templates/app.html', 'text!templates/project.html', 'text!templates/build.html'], (Router, template, projectTemplate, buildTemplate) ->
 
-  router = Router()
+  ProjectsController = (params) ->
+    Bacon.$.ajax("/api/project").onValue (projects) ->
+      context = { projects: projects}
+      element = Handlebars.compile(template)(context)
+      $('#content').html(element)
 
-  router.addRoute('project','!/:project')
-  router.addRoute('build','!/:project/build/:build')
-  router.addRoute('projects','!/')
+  ProjectController = (params) ->
+    project = params.project
+    Bacon.combineAsArray(Bacon.$.ajax("/api/project/"+project), Bacon.$.ajax("/api/project/"+project+"/build")).onValue (resp) ->
+      project = resp[0]
+      builds = resp[1]
+      element = Handlebars.compile(projectTemplate)({project: project, builds: builds})
+      $('#content').html(element)
 
-  router.router.onValue (params) ->
-    console.log "PARAMS. ", params
+  BuildController = (params) ->
+    project = params.project
+    build = params.build
+    Bacon.combineAsArray(
+        Bacon.$.ajax("/api/project/"+project), 
+        Bacon.$.ajax("/api/project/"+project+"/build/"+build),
+        Bacon.$.ajax("/api/project/"+project+"/build/"+build+"/tests")).onValue (resp) ->
+      project = resp[0]
+      build = resp[1]
+      tests = resp[2]
+      element = Handlebars.compile(buildTemplate)({project: project, build: build, tests: tests})
+      $('#content').html(element)
 
-  Bacon.$.ajax("/api/project").onValue (projects) ->
-    context = { projects: projects}
-    element = Handlebars.compile(template)(context)
-    $('#content').html(element)
+  router = Router({
+    '!/:project/:build': BuildController
+    '!/:project': ProjectController
+    '!/': ProjectsController
+    '!': ProjectsController
+    '': ProjectsController
+  })
+
+  router.onValue (value) ->
+    console.log "PARAMS. ", value
+    value.controller(value.params)
+
   
+
+    

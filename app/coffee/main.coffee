@@ -11,7 +11,7 @@ requirejs.config
 		  deps: ['lodash', 'jquery']
 			exports: 'Handlebars'
 		'simrou':
-		  deps: ['jquery']
+			deps: ['jquery']
 			exports: 'Simrou'
 
 		'bootstrap-affix': 		{ deps: ['jquery'], exports: '$' }
@@ -55,7 +55,13 @@ requirejs.config
 		'bootstrap-transition':	'../components/bootstrap/js/bootstrap-transition'
 		'bootstrap-typeahead': 	'../components/bootstrap/js/bootstrap-typeahead'
 
-require ['vendors'], ->
+require [
+  'lodash'
+  'jquery'
+  'bacon'
+  'bacon.jquery'
+  'handlebars'
+  'simrou'], () ->
 
-	require ['ClientApp'], () ->
+  	require ['ClientApp'], () ->
 

@@ -192,6 +192,7 @@ module.exports = (grunt)->
     copy:
       dist:
         files: [
+          { expand: true, cwd: '<%= yeoman.app %>/components', src: ['**'], dest: '<%= yeoman.dist %>/components' }
           { expand: true, cwd: '<%= yeoman.tmp %>/', src: ['**'], dest: '<%= yeoman.tmp_dist %>/' }
           { expand: true, cwd: '<%= yeoman.app %>/', src: ['**'], dest: '<%= yeoman.tmp_dist %>/' }
         ]
@@ -248,27 +249,16 @@ module.exports = (grunt)->
     requirejs:
       compile:
         options:
-          # no minification, is done by the min task
-          baseUrl: 'js/'
-          appDir: './<%= yeoman.tmp_dist %>/'
-          dir: './<%= yeoman.dist %>/'
-          
-          wrap: true
-
-          removeCombined: true
-          keepBuildDir: true
-
-          inlineText: true
+          baseUrl: '<%= yeoman.tmp_dist %>/js/'
+          #wrap: true
+          #removeCombined: true
+          #keepBuildDir: true
+          #inlineText: true
           mainConfigFile: '<%= yeoman.tmp_dist %>/js/main.js'
-
           optimize: "none"
-
-          modules: [
-            { name: 'vendors', exclude: [] }
-            ##{ name: 'ClientApp', exclude: ['vendors'] }
-            { name: 'main', exclude: ['ClientApp', 'vendors'] }
-          ]
-
+          name: "main"
+          out: "<%= yeoman.dist %>/js/main.js"
+         
 
   grunt.registerTask('server', [
     'coffee:dist'
@@ -311,7 +301,7 @@ module.exports = (grunt)->
     'clean:components'
     'clean:templates'
     'clean:spec'
-    'uglify'
+    #'uglify'
   ])
 
   grunt.registerTask('default', ['build'])
