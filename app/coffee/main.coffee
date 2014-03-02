@@ -1,5 +1,30 @@
 requirejs.config
 	baseUrl: './js'
+	shim:
+		'lodash':
+			exports: '_'
+		'jquery':
+			exports: '$'
+		'bacon':
+			exports: 'Bacon'
+
+		'bootstrap-affix': 		{ deps: ['jquery'], exports: '$' }
+		'bootstrap-alert': 		{ deps: ['jquery'], exports: '$' }
+		'bootstrap-button': 	{ deps: ['jquery'], exports: '$' }
+		'bootstrap-carousel': 	{ deps: ['jquery'], exports: '$' }
+		'bootstrap-collapse': 	{ deps: ['jquery'], exports: '$' }
+		'bootstrap-dropdown': 	{ deps: ['jquery'], exports: '$' }
+		'bootstrap-modal': 		{ deps: ['jquery'], exports: '$' }
+		'bootstrap-popover': 	{ deps: ['jquery'], exports: '$' }
+		'bootstrap-scrollspy': 	{ deps: ['jquery'], exports: '$' }
+		'bootstrap-tab': 		{ deps: ['jquery'], exports: '$' }
+		'bootstrap-tooltip': 	{ deps: ['jquery'], exports: '$' }
+		'bootstrap-transition': { deps: ['jquery'], exports: '$' }
+		'bootstrap-typeahead': 	{ deps: ['jquery'], exports: '$' }
+
+		'modernizr':
+			exports: 'Modernizr'
+
 	paths:
 		'lodash': '../components/lodash/dist/lodash'
 		'jquery': '../components/jquery/jquery'
@@ -21,7 +46,7 @@ requirejs.config
 		'bootstrap-transition':	'../components/bootstrap/js/bootstrap-transition'
 		'bootstrap-typeahead': 	'../components/bootstrap/js/bootstrap-typeahead'
 
-require ['jquery', 'lodash', 'bacon', 'bacon.jquery'], ->
+require ['vendors'], ->
 
-	require ['ClientApp'], (App) ->
-		console.log "Initialized!"
+	require ['ClientApp'], () ->
+

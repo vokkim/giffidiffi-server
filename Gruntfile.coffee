@@ -60,13 +60,15 @@ module.exports = (grunt)->
   grunt.loadNpmTasks('grunt-contrib-watch')
   grunt.loadNpmTasks('grunt-open')
   grunt.loadNpmTasks('grunt-usemin')
+  grunt.loadNpmTasks('grunt-mocha')
   grunt.loadNpmTasks('grunt-coffeecov')
 
   # configurable paths
   yeomanConfig = {
     app: 'app'
-    #src: 'src'
+    src: 'app'
     dist: 'dist'
+    test: 'test'
 
     tmp: '.tmp'
     tmp_dist: '.tmp-dist'
@@ -94,11 +96,11 @@ module.exports = (grunt)->
         interrupt: true
 
       coffee:
-        files: ['<%= yeoman.app %>/coffee/{,**/}*.coffee']
+        files: ['<%= yeoman.src %>/coffee/{,**/}*.coffee']
         tasks: ['coffee:dist']
       
       compass:
-        files: ['<%= yeoman.app %>/sass/{,**/}*.{scss,sass}']
+        files: ['<%= yeoman.src %>/sass/{,**/}*.{scss,sass}']
         tasks: ['compass:server']
       
       files:
@@ -134,11 +136,36 @@ module.exports = (grunt)->
               mountFolder(connect, yeomanConfig.dist)
             ]
 
+      test:
+        options:
+          port: yeomanConfig.server_port + 2
+          hostname: '0.0.0.0'
+          middleware: (connect)->
+            return [
+              require('connect-livereload')(port: yeomanConfig.livereload_port)
+              fileHTMLRewriter
+                snippet: [
+                  "<!-- Test snippet -->",
+                  "<script src=\"components/mocha/mocha.js\"></script>",
+                  "<link rel=\"stylesheet\" href=\"components/mocha/mocha.css\">",
+                  "<script>",
+                  "    window.is_test = true;",
+                  "</script>",
+                  ""
+                ].join('\n')
+                regex: /<!-- Test snippet -->/
+              mountFolder(connect, yeomanConfig.test)
+              mountFolder(connect, yeomanConfig.tmp)
+              mountFolder(connect, yeomanConfig.app)
+            ]
+
     open:
       server:
         path: 'http://localhost:<%= connect.server.options.port %>'
       dist:
         path: 'http://localhost:<%= connect.dist.options.port %>'
+      test:
+        path: 'http://localhost:<%= connect.test.options.port %>'
 
     clean:
       dist: ['<%= yeoman.dist %>']
@@ -151,7 +178,7 @@ module.exports = (grunt)->
     coffee:
       dist:
         expand: true
-        cwd: '<%= yeoman.app %>/coffee/'
+        cwd: '<%= yeoman.src %>/coffee/'
         src: ['**/*.coffee']
         dest: '<%= yeoman.tmp %>/js'
         ext: '.js'
@@ -160,12 +187,12 @@ module.exports = (grunt)->
       options:
         path: 'relative'
       dist:
-        src: '<%= yeoman.app %>/coffee/app'
+        src: '<%= yeoman.src %>/coffee/app'
         dest: '<%= yeoman.tmp %>/js/app'
 
     compass:
       options:
-        sassDir: '<%= yeoman.app %>/sass'
+        sassDir: '<%= yeoman.src %>/sass'
         cssDir: '<%= yeoman.tmp %>/css'
         imagesDir: '<%= yeoman.app %>/images'
         javascriptsDir: '<%= yeoman.app %>/js'
@@ -195,6 +222,17 @@ module.exports = (grunt)->
           yuicompress: true
         files:
             '<%= yeoman.tmp %>/css/all-less.css' : '<%= yeoman.app %>/components/bootstrap/less/{bootstrap,responsive}.less'
+
+    mocha:
+      all: 
+        options:
+          mocha:
+            ignoreLeaks: true
+
+          urls: ['http://localhost:<%= connect.test.options.port %>/']
+          run: false
+          reporter: 'mocha-phantom-coverage-reporter'
+          timeout: 60000
 
     copy:
       dist:
@@ -271,11 +309,19 @@ module.exports = (grunt)->
           optimize: "none"
 
           modules: [
-            ##{ name: 'app/vendors', exclude: [] }
-            ##{ name: 'app/app', exclude: ['app/vendors'] }
-            ##{ name: 'main', exclude: ['config', 'app/app', 'app/vendors'] }
-            { name: 'main', exclude: [] }
+            { name: 'vendors', exclude: [] }
+            ##{ name: 'ClientApp', exclude: ['vendors'] }
+            { name: 'main', exclude: ['ClientApp', 'vendors'] }
           ]
+  
+  grunt.registerTask('test', [
+    'coffee:dist'
+    'coffeecov:dist'
+    'compass:server'
+    'less:server'
+    'connect:test'
+    #'mocha'
+  ])
 
   grunt.registerTask('server', [
     'coffee:dist'
@@ -283,6 +329,16 @@ module.exports = (grunt)->
     'less:server'
     'connect:server'
     'open:server'
+    'watch'
+  ])
+
+  grunt.registerTask('server-test', [
+    'coffee:dist'
+    'coffeecov:dist'
+    'compass:server'
+    'less:server'
+    'connect:test'
+    'open:test'
     'watch'
   ])
 
@@ -306,6 +362,8 @@ module.exports = (grunt)->
     'compass:dist'
     'less:dist'
     'copy:dist'
+    'connect:test'
+    #'mocha'
     'requirejs:compile'
     'useminPrepare'
     'imagemin'
