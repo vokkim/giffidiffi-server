@@ -11,12 +11,13 @@ initExpressApplication = () ->
   app.use express.urlencoded()
   app.use express.multipart()
 
-  app.use(express.static(__dirname + './../dist'))
-
   app.configure 'development', () ->
+    app.use(express.static(__dirname + './../.tmp'));
+    app.use(express.static(__dirname + './../app'));
     app.use express.errorHandler({ dumpExceptions: true, showStack: true })
 
   app.configure 'production', () ->
+    app.use(express.static(__dirname + './../dist'))
     app.use express.errorHandler()
   app
 

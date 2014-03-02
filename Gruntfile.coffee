@@ -1,5 +1,3 @@
-mountFolder = (connect, dir)->
-  return connect.static(require('path').resolve(dir))
 
 fileHTMLRewriter = ({regex, snippet})->
   excludeList = [".woff", ".js", ".css", ".ico"]
@@ -50,7 +48,6 @@ module.exports = (grunt)->
   grunt.loadNpmTasks('grunt-contrib-compass')
   grunt.loadNpmTasks('grunt-contrib-less')
   grunt.loadNpmTasks('grunt-contrib-concat')
-  grunt.loadNpmTasks('grunt-contrib-connect')
   grunt.loadNpmTasks('grunt-contrib-copy')
   grunt.loadNpmTasks('grunt-contrib-cssmin')
   grunt.loadNpmTasks('grunt-contrib-htmlmin')
@@ -61,6 +58,7 @@ module.exports = (grunt)->
   grunt.loadNpmTasks('grunt-open')
   grunt.loadNpmTasks('grunt-usemin')
   grunt.loadNpmTasks('grunt-coffeecov')
+  grunt.loadNpmTasks('grunt-express-server')
 
   # configurable paths
   yeomanConfig = {
@@ -71,7 +69,6 @@ module.exports = (grunt)->
     tmp: '.tmp'
     tmp_dist: '.tmp-dist'
 
-    server_port: 9000
     livereload_port: 35729
   }
 
@@ -114,31 +111,22 @@ module.exports = (grunt)->
         options:
           livereload: yeomanConfig.livereload_port
 
-    connect:
-      server:
+    express: 
+      options: 
+        cmd: 'coffee'
+        port: 3000
+        script: 'index.coffee'
+      server: 
         options:
-          port: yeomanConfig.server_port
-          hostname: '0.0.0.0'
-          middleware: (connect)->
-            return [
-              require('connect-livereload')(port: yeomanConfig.livereload_port)
-              mountFolder(connect, yeomanConfig.tmp)
-              mountFolder(connect, yeomanConfig.app)
-            ]
-      dist:
+          node_env: 'development'
+      dist: 
         options:
-          port: yeomanConfig.server_port + 1
-          hostname: '0.0.0.0'
-          middleware: (connect)->
-            return [
-              mountFolder(connect, yeomanConfig.dist)
-            ]
-
+          node_env: 'production'
     open:
       server:
-        path: 'http://localhost:<%= connect.server.options.port %>'
+        path: 'http://localhost:<%= express.options.port %>'
       dist:
-        path: 'http://localhost:<%= connect.dist.options.port %>'
+        path: 'http://localhost:<%= express.options.port %>'
       
     clean:
       dist: ['<%= yeoman.dist %>']
@@ -281,13 +269,14 @@ module.exports = (grunt)->
     'coffee:dist'
     'compass:server'
     'less:server'
-    'connect:server'
+    'express:server'
     'open:server'
     'watch'
   ])
 
   grunt.registerTask('server-dist', [
-    'connect:dist'
+    'build'
+    'express:dist'
     'open:dist'
     'watch:files'
   ])
