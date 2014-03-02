@@ -1,4 +1,3 @@
-
 fileHTMLRewriter = ({regex, snippet})->
   excludeList = [".woff", ".js", ".css", ".ico"]
 
@@ -97,7 +96,13 @@ module.exports = (grunt)->
       compass:
         files: ['<%= yeoman.src %>/sass/{,**/}*.{scss,sass}']
         tasks: ['compass:server']
-      
+
+      express:
+        files:  [ '<%= yeoman.server %>/{,**/}*.coffee' ]
+        tasks:  [ 'express:server' ]
+        options:
+          spawn: false
+
       files:
         files: [
           '<%= yeoman.tmp %>/{,**/}*.{css,js}'

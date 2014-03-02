@@ -15,7 +15,7 @@ initExpressApplication = () ->
     app.use(express.static(__dirname + './../.tmp'));
     app.use(express.static(__dirname + './../app'));
     app.use express.errorHandler({ dumpExceptions: true, showStack: true })
-
+   
   app.configure 'production', () ->
     app.use(express.static(__dirname + './../dist'))
     app.use express.errorHandler()
