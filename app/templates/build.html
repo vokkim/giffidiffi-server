@@ -4,25 +4,24 @@
   Build #{{build.buildNumber}}
 </h1>
 
-
-<div class="header">
-  <div class="row">
-    <div class="col-md-8">.col-md-8</div>
-    <div class="col-md-4">.col-md-4</div>
-  </div>
-</div>
+<p></p>
 <div class="tests">
 {{#each tests}}
   <div class="row">
     <div class="col-md-1">
       <div class="status {{status}}">
-        <span class="glyphicon glyphicon-ok"></span>
+        <span class="glyphicon"></span>
       </div>
     </div>
-    <div class="col-md-5">{{testName}}</div>
-    <div class="col-md-2">Thumbnail-captured</div>
-    <div class="col-md-2">Thumbnail-diff</div>
-    <div class="col-md-2">Thumbnail-reference</div>
+    <div class="col-md-5">
+      <h3>
+        {{testName}}
+      </h3>
+      <small>{{created}}</small>
+    </div>
+    <div class="col-md-2"> <img src="/api/project/{{../project.name}}/build/{{../build.buildNumber}}/tests/{{testName}}/original"> </div>
+    <div class="col-md-2"> <img src="/api/project/{{../project.name}}/build/{{../build.buildNumber}}/tests/{{testName}}/diff"> </div>
+    <div class="col-md-2"> <img src="/api/project/{{../project.name}}/build/{{../build.buildNumber}}/tests/{{testName}}/reference"> </div>
   </div>
 {{/each}}
 </div>

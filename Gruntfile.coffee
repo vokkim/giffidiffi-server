@@ -160,14 +160,14 @@ module.exports = (grunt)->
         options:
           dumpLineNumbers: 'all'
         files:
-            '<%= yeoman.tmp %>/css/all-less.css' : '<%= yeoman.app %>/less/bootstrap.less'
+            '<%= yeoman.tmp %>/css/all-less.css' : '<%= yeoman.app %>/less/app.less'
 
       dist:
         options:
           compress: true
           yuicompress: true
         files:
-            '<%= yeoman.tmp %>/css/all-less.css' : '<%= yeoman.app %>/less/bootstrap.less'
+            '<%= yeoman.tmp %>/css/all-less.css' : '<%= yeoman.app %>/less/app.less'
 
     copy:
       dist:

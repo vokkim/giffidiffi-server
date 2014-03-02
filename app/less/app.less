@@ -1,0 +1,60 @@
+
+@import "../components/bootstrap/less/bootstrap.less";
+@icon-font-path: "../components/bootstrap/fonts/";
+
+@fail-bg: @state-danger-bg;
+@fail-text: @state-danger-text;
+@success-bg: @state-success-bg;
+@success-text: @state-success-text;
+
+.tests {
+  margin-top: 40px;
+  .row {
+    margin-bottom: 10px;
+    &:hover {
+      background: #FCFCFC;
+    }
+
+    h3 {
+      margin-top: 15px;
+      margin-bottom: 0px;
+    }
+    small {
+      color: @gray-light;
+    }
+  }
+
+  .status {
+    margin-left: -15px;
+    width: 80px;
+    height: 80px;
+    background-color: #DFF0D8;
+    text-align: center;
+    padding-top: 10px;
+    font-size: 45px;
+
+    &.success, &.ok {
+      span.glyphicon {
+        .glyphicon-ok;
+      }
+      color: @success-text;
+      background: @success-bg;
+    }
+
+    &.bad, &.fail {
+      span.glyphicon {
+        .glyphicon-warning-sign;
+      }
+      color: @fail-text;
+      background: @fail-bg;
+    }
+  }
+
+  img {
+    max-width: 80px;
+    max-height: 80px;
+  }
+  
+}
+
+
