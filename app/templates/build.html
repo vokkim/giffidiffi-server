@@ -1,33 +1,34 @@
+<div>
+  <h1>
+    <small><a href="#!/{{project.name}}/">Project: {{project.displayName}}</a></small><br/>
+    Build #{{build.buildNumber}}
+  </h1>
 
-<h1>
-  <small><a href="#!/{{project.name}}/">Project: {{project.displayName}}</a></small><br/>
-  Build #{{build.buildNumber}}
-</h1>
-
-<p></p>
-<div class="tests">
-{{#each tests}}
-  <div class="row">
-    <div class="col-md-1">
-      <div class="status {{status}}">
-        <span class="glyphicon"></span>
+  <p></p>
+  <div class="tests">
+  {{#each tests}}
+    <div class="row {{status}} selected" data-id="{{id}}">
+      <div class="col-md-1">
+        <div class="status {{status}}">
+          <span class="glyphicon"></span>
+        </div>
+      </div>
+      <div class="col-md-5">
+        <h3>
+          {{testName}}
+        </h3>
+        <small>{{created}}</small>
+      </div>
+      <div class="col-md-2"> 
+        <img class="lazy" data-original="/api/project/{{../project.name}}/build/{{../build.buildNumber}}/tests/{{testName}}/original">
+      </div>
+      <div class="col-md-2">
+        <img class="lazy" data-original="/api/project/{{../project.name}}/build/{{../build.buildNumber}}/tests/{{testName}}/diff">
+      </div>
+      <div class="col-md-2"> 
+        <img class="lazy" data-original="/api/project/{{../project.name}}/build/{{../build.buildNumber}}/tests/{{testName}}/reference">
       </div>
     </div>
-    <div class="col-md-5">
-      <h3>
-        {{testName}}
-      </h3>
-      <small>{{created}}</small>
-    </div>
-    <div class="col-md-2"> 
-      <img class="lazy" data-original="/api/project/{{../project.name}}/build/{{../build.buildNumber}}/tests/{{testName}}/original">
-    </div>
-    <div class="col-md-2">
-      <img class="lazy" data-original="/api/project/{{../project.name}}/build/{{../build.buildNumber}}/tests/{{testName}}/diff">
-    </div>
-    <div class="col-md-2"> 
-      <img class="lazy" data-original="/api/project/{{../project.name}}/build/{{../build.buildNumber}}/tests/{{testName}}/reference">
-    </div>
+  {{/each}}
   </div>
-{{/each}}
 </div>

@@ -10,9 +10,16 @@
 .tests {
   margin-top: 40px;
   .row {
-    margin-bottom: 20px;
+    clear: both;
+    margin-top: 20px;
     &:hover {
       background: #FCFCFC;
+      cursor: pointer;
+    }
+
+    &.fail.selected, &.bad.selected {
+      border-left: 4px solid @fail-text;
+      background:@fail-bg;
     }
 
     h3 {
@@ -21,6 +28,40 @@
     }
     small {
       color: @gray-light;
+    }
+
+    img {
+      padding: 10px;
+      max-width: 70px;
+      max-height: 70px;
+    }
+  }
+
+  .test-details {
+    margin: 0px -15px;
+    background: #F7F7F9;
+    padding: 20px;
+    border-left: 4px solid #E9E9E9;
+
+    .frame {
+      margin: auto;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      max-width: 90%;
+      max-height: 800px;
+      position: relative;
+      .image {
+        visibility: hidden;
+        //position: absolute;
+        top: 20px;
+
+        &.shown {
+          visibility: visible;
+        }
+      }
+      .original, .diff, .reference {
+      }
+
     }
   }
 
@@ -50,11 +91,6 @@
     }
   }
 
-  img {
-    padding: 10px;
-    max-width: 80px;
-    max-height: 80px;
-  }
   
 }
 
