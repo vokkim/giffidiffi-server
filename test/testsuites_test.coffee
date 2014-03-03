@@ -24,6 +24,7 @@ describe 'Testsuites', ->
     request(url).get('/api/project/testproject/build/2/tests/first_test/original').expect('Content-Type', /png/)
     .parse(imageParser).end (err, res) ->
       res.status.should.equal(200)
+      res.get('Cache-Control').should.equal('max-age=259200')
       imageComparator('./test/2_first_test.png', res.body, done)
 
   it 'get difference image for test', (done) ->   

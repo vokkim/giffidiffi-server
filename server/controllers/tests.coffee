@@ -122,7 +122,7 @@ module.exports = (db) ->
         .flatMap (attachment) ->
           if _.isEmpty(attachment)
             return new Bacon.Error {result: "No " + requestedImage + " image", status: 404}
-          { result: attachment.value, contentType: attachment.type }
+          return { result: attachment.value, contentType: attachment.type, additionalHeaders: {'Cache-Control':'max-age=259200'} }
     else
       return Bacon.once(new Bacon.Error {result: "Unknown image type: " + requestedImage, status: 400})
 

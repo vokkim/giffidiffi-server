@@ -10,13 +10,17 @@ define [], ()->
           params: params 
         }
 
+    getHash = ->
+     (if !!document.location.hash then document.location.hash else "!/")
     hash = () ->
-      getHash = ->
-        (if !!document.location.hash then document.location.hash else "!/")
       $(window).asEventStream("hashchange").map(getHash).toProperty(getHash()).skipDuplicates()
 
     hash().onValue (r) ->
       console.log "onval ", r
       simrou.navigate(r);
+
+    setTimeout ()->
+      simrou.navigate(getHash());
+    , 1
 
     routeBus

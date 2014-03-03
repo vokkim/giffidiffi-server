@@ -32,7 +32,7 @@ setup = (app, controllers) ->
       controller(val.request())
       .map (result) ->
         if _.has(result, 'result')
-          return { response: val.response, result: result.result, status: result.status, contentType: result.contentType }
+          return { response: val.response, result: result.result, status: result.status, contentType: result.contentType, additionalHeaders: result.additionalHeaders }
         else
           return { response: val.response, result: result }
       .mapError (e) ->
@@ -44,6 +44,8 @@ setup = (app, controllers) ->
     .onValue (val) ->
       status = if val.status then val.status else 200
       contentType = if val.contentType then val.contentType else 'application/json'
+      if val.additionalHeaders
+        val.response().set(val.additionalHeaders)
       val.response().status(status).type(contentType).send(val.result)
 
 
