@@ -6,8 +6,12 @@
 
   <p></p>
   <div class="tests">
+  {{#unless tests.length}}
+    <h2>No tests</h2>
+  {{/unless}}
+  
   {{#each tests}}
-    <div class="row {{status}} selected" data-id="{{id}}">
+    <div class="row {{status}}" data-id="{{id}}">
       <div class="col-md-1">
         <div class="status {{status}}">
           <span class="glyphicon"></span>

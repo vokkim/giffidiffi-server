@@ -7,6 +7,9 @@ requirejs.config
 			exports: '$'
 		'bacon':
 			exports: 'Bacon'
+	  'bacon.matchers':
+	    deps: ['bacon']
+	    exports: 'Bacon'
 		'handlebars':
 		  deps: ['lodash', 'jquery']
 			exports: 'Handlebars'
@@ -40,6 +43,7 @@ requirejs.config
 		'jquery': '../components/jquery/jquery'
 		'bacon': '../components/bacon/dist/bacon'
 		'bacon.jquery': '../components/bacon.jquery/dist/bacon.jquery'
+		'bacon.matchers': '../components/bacon.matchers/bacon.matchers'
 		'handlebars': '../components/handlebars/dist/handlebars'
 		'simrou': '../components/simrou/build/simrou'
 		'text' : '../components/requirejs-text/text'
@@ -66,6 +70,7 @@ require [
   'lazyload'
   'bacon'
   'bacon.jquery'
+  'bacon.matchers'
   'handlebars'
   'simrou'], () ->
 

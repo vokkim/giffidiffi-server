@@ -14,9 +14,11 @@ define ['Router', 'text!templates/app.html', 'text!templates/project.html', 'tex
       element = Handlebars.compile(projectTemplate)({project: project, builds: builds})
       $('#content').html(element)
 
-  TestDetailsController = (testRow, test) ->
+  TestDetailsController = (testRow, test, visibility) ->
     element = $(Handlebars.compile(testDetailsTemplate)(test).trim())
-    testRow.after(element)
+    visibility.where().truthy().onValue () -> testRow.after(element)
+    visibility.where().not().truthy().onValue () -> element.remove()
+
     _.forIn test.images, (value, key)->
       if _.isEmpty(value)
         element.find('.'+key).attr('disabled', 'disabled')
@@ -29,10 +31,10 @@ define ['Router', 'text!templates/app.html', 'text!templates/project.html', 'tex
 
     selected.onValue (selection) ->
       element.find('button').removeClass('active')
-      element.find('.'+selection).addClass('active')
+      element.find('button.'+selection).addClass('active')
+      element.find('.frame .image').hide()
+      element.find('.frame .' + selection).show()
 
-      element.find('.frame .image').removeClass('shown')
-      element.find('.frame .' + selection).addClass('shown')
 
   BuildController = (params) ->
     project = params.project
@@ -51,7 +53,12 @@ define ['Router', 'text!templates/app.html', 'text!templates/project.html', 'tex
         id = row.data('id')
         test = _.find tests, (test) ->
           test.id == id
-        TestDetailsController(row, test)
+
+        visibility = row.clickE().map ()-> !row.hasClass('selected')
+        visibility.toProperty(false).assign(row, 'toggleClass', 'selected')
+
+        TestDetailsController(row, test, visibility)
+
 
       $('#content').html(element)
       $("img.lazy").lazyload()
@@ -69,7 +76,6 @@ define ['Router', 'text!templates/app.html', 'text!templates/project.html', 'tex
   })
 
   router.onValue (value) ->
-    console.log "PARAMS. ", value
     value.controller(value.params)
 
   

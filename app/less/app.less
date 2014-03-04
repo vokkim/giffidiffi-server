@@ -17,9 +17,16 @@
       cursor: pointer;
     }
 
+    border-left: 4px solid transparent;
+
     &.fail.selected, &.bad.selected {
       border-left: 4px solid @fail-text;
       background:@fail-bg;
+    }
+
+    &.success.selected, &.good.selected {
+      border-left: 4px solid @success-text;
+      background:@success-bg;
     }
 
     h3 {
@@ -38,10 +45,16 @@
   }
 
   .test-details {
+
     margin: 0px -15px;
     background: #F7F7F9;
     padding: 20px;
     border-left: 4px solid #E9E9E9;
+    text-align: center;
+
+    .btn {
+      min-width: 100px;
+    }
 
     .frame {
       margin: auto;
@@ -51,13 +64,9 @@
       max-height: 800px;
       position: relative;
       .image {
-        visibility: hidden;
-        //position: absolute;
+        min-height: 40px;
+        display: none;
         top: 20px;
-
-        &.shown {
-          visibility: visible;
-        }
       }
       .original, .diff, .reference {
       }
@@ -73,7 +82,7 @@
     padding-top: 6px;
     font-size: 45px;
 
-    &.success, &.ok {
+    &.success, &.good {
       span.glyphicon {
         .glyphicon-ok;
       }
