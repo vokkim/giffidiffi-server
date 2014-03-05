@@ -1,10 +1,21 @@
 <div class="row test {{status}}" data-id="{{id}}">
   <div class="col-md-1">
+    {{#if isNewTest}}
+    <div class="new-test">
+      <span class="glyphicon glyphicon-certificate"></span>
+      <span class="new">New</span>
+    </div>
+    {{/if}}
+    {{#if showMarkAsBadButton}}
+      <div class="marked">
+        <span class="glyphicon glyphicon-thumbs-up"></span>
+      </div>
+    {{/if}}
     <div class="status {{status}}">
       <span class="glyphicon"></span>
     </div>
   </div>
-  <div class="col-md-4">
+  <div class="col-md-5">
     <h3>
       {{testName}}
     </h3>
@@ -16,10 +27,7 @@
   <div class="col-md-2">
     <img class="lazy" data-original="/api/project/{{project}}/build/{{buildNumber}}/tests/{{testName}}/diff">
   </div>
-  <div class="col-md-2"> 
-    <img class="lazy" data-original="/api/project/{{project}}/build/{{buildNumber}}/tests/{{testName}}/reference">
-  </div>
-  <div class="col-md-1 mark-button"> 
+  <div class="col-md-2 mark-button"> 
     {{#if showMarkAsOkButton}}
     <button type="button" class="btn btn-success">
       <span class="glyphicon glyphicon-thumbs-up"></span> Good

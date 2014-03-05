@@ -18,6 +18,7 @@ define ['Router', 'text!templates/app.html', 'text!templates/project.html', 'tex
     context =
       showMarkAsOkButton: _.contains(['fail'], test.status)
       showMarkAsBadButton: _.contains(['good'], test.status)
+      isNewTest: !test.images.reference
 
     element = $(Handlebars.compile(testRowTemplate)(_.merge(context, test)).trim())
    
@@ -83,9 +84,6 @@ define ['Router', 'text!templates/app.html', 'text!templates/project.html', 'tex
       $("img.lazy").lazyload()
 
 
-
-
-
   router = Router({
     '!/:project/:build': BuildController
     '!/:project': ProjectController
@@ -96,7 +94,3 @@ define ['Router', 'text!templates/app.html', 'text!templates/project.html', 'tex
 
   router.onValue (value) ->
     value.controller(value.params)
-
-  
-
-    

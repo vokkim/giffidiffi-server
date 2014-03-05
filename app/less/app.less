@@ -55,13 +55,9 @@
       background:@fail-bg;
     }
 
-    &.success.selected {
+    &.success.selected, &.good.selected {
       border-left: 4px solid @success-text;
       background:@success-bg;
-    }
-
-    &.good.selected {
-      border-left: 4px solid @success-text;
     }
 
     h3 {
@@ -78,12 +74,15 @@
       max-height: 70px;
     }
 
-    .mark-button button {
-      margin-top: 17px;
-      span {
-        margin-right: 5px;
-        vertical-align: text-bottom;
-        font-size: @font-size-large;
+    .mark-button {
+      text-align: center;
+      button {
+        margin-top: 17px;
+        span {
+          margin-right: 5px;
+          vertical-align: text-bottom;
+          font-size: @font-size-large;
+        }
       }
     }
   }
@@ -117,7 +116,29 @@
 
     }
   }
-
+  .marked {
+    position: absolute;
+    top: 4px;
+    font-size: 24px;
+    color: @gray-dark;
+  }
+  .new-test {
+    position: absolute;
+    left: 0px;
+    top: -10px;
+    .new {
+      color: white;
+      font-size: 10px;
+      font-weight: 800;
+      position: absolute;
+      top: 15px;
+      left: 12px;
+    }
+    .glyphicon {
+      font-size: 45px;
+      color: @brand-warning;
+    }
+  }
   .status {
     width: 70px;
     height: 70px;
