@@ -73,9 +73,16 @@ define ['Router', 'text!templates/app.html', 'text!templates/project.html', 'tex
         Bacon.$.ajax("/api/project/"+project+"/build/"+build),
         Bacon.$.ajax("/api/project/"+project+"/build/"+build+"/tests")).onValues (project, build, tests) ->
       numOfFailed = _.filter(tests, (test) -> test.status == "fail").length
-      element = $(Handlebars.compile(buildTemplate)({project: project, build: build, tests: tests, numOfFailed: numOfFailed}).trim())
+      context = 
+        numOfFailed: numOfFailed
+        numOfTests: tests.length
+        projectDisplayName: project.displayName
+      element = $(Handlebars.compile(buildTemplate)(_.merge(context, build)).trim())
 
-      testRows = _.map tests, (test) ->
+
+      sortedTests = _.sortBy(tests, ['status', 'testName'])
+
+      testRows = _.map sortedTests, (test) ->
         TestRowController(test)
 
       element.find('.tests').append(testRows)

@@ -2,22 +2,21 @@
   <div class="row">
     <div class="col-md-6">
       <h1>
-        <small><a href="#!/{{project.name}}/">Project: {{project.displayName}}</a></small><br/>
-        Build #{{build.buildNumber}}
+        <small><a href="#!/{{project}}/">Project: {{projectDisplayName}}</a></small><br/>
+        Build #{{buildNumber}}
       </h1>
     </div>
 
     <div class="col-md-6">
      <div class="build-status">
-      <span class="label status {{build.status}}">{{build.status}}</span><span class="label fails">Failing tests: {{numOfFailed}} / {{tests.length}}</span>
+      <span class="label status {{status}}">{{status}}</span><span class="label fails">Failing tests: {{numOfFailed}} / {{numOfTests}}</span>
      </div>
     </div>
   </div>
 
-
   <p></p>
 
-  {{#if tests.length}}
+  {{#if numOfTests}}
   <div class="row header">
     <div class="col-md-1">Test</div>
     <div class="col-md-5"></div>
