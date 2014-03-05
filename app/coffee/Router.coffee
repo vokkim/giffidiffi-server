@@ -16,7 +16,6 @@ define [], ()->
       $(window).asEventStream("hashchange").map(getHash).toProperty(getHash()).skipDuplicates()
 
     hash().onValue (r) ->
-      console.log "onval ", r
       simrou.navigate(r);
 
     setTimeout ()->

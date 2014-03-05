@@ -1,4 +1,4 @@
-define ['Router', 'text!templates/app.html', 'text!templates/project.html', 'text!templates/build.html', 'text!templates/test_details.html'], (Router, template, projectTemplate, buildTemplate, testDetailsTemplate) ->
+define ['Router', 'text!templates/app.html', 'text!templates/project.html', 'text!templates/build.html', 'text!templates/test_row.html', 'text!templates/test_details.html'], (Router, template, projectTemplate, buildTemplate, testRowTemplate, testDetailsTemplate) ->
 
   ProjectsController = (params) ->
     Bacon.$.ajax("/api/project").onValue (projects) ->
@@ -14,26 +14,54 @@ define ['Router', 'text!templates/app.html', 'text!templates/project.html', 'tex
       element = Handlebars.compile(projectTemplate)({project: project, builds: builds})
       $('#content').html(element)
 
+  TestRowController = (test) ->
+    context =
+      showMarkAsOkButton: _.contains(['fail'], test.status)
+      showMarkAsBadButton: _.contains(['good'], test.status)
+
+    element = $(Handlebars.compile(testRowTemplate)(_.merge(context, test)).trim())
+   
+    visibility = element.clickE().map ()-> !element.hasClass('selected')
+    visibility.toProperty(false).assign(element, 'toggleClass', 'selected')
+    TestDetailsController(element, test, visibility)
+
+    createButton = (markedValue) ->
+      buttonElement = element.find('.mark-button')
+      clicks = buttonElement.clickE().map (e) ->
+        e.stopPropagation()
+        markedValue
+      .flatMap () ->
+        Bacon.$.ajaxPost("/api/project/"+test.project+"/build/"+test.buildNumber+"/tests/"+test.testName+"/"+markedValue)
+      .onValue () ->
+        location.reload()
+
+    if context.showMarkAsBadButton then createButton('bad')
+    if context.showMarkAsOkButton then createButton('good')
+
+    return element
+
   TestDetailsController = (testRow, test, visibility) ->
     element = $(Handlebars.compile(testDetailsTemplate)(test).trim())
-    visibility.where().truthy().onValue () -> testRow.after(element)
     visibility.where().not().truthy().onValue () -> element.remove()
 
-    _.forIn test.images, (value, key)->
-      if _.isEmpty(value)
-        element.find('.'+key).attr('disabled', 'disabled')
+    visibility.where().truthy().onValue () -> 
+      testRow.after(element)
 
-    selected = Bacon.mergeAll(
-      element.find('.original').clickE().map('original'),
-      element.find('.diff').clickE().map('diff'),
-      element.find('.reference').clickE().map('reference'),
-      ).toProperty('original').skipDuplicates()
+      _.forIn test.images, (value, key)->
+        if _.isEmpty(value)
+          element.find('.'+key).attr('disabled', 'disabled')
 
-    selected.onValue (selection) ->
-      element.find('button').removeClass('active')
-      element.find('button.'+selection).addClass('active')
-      element.find('.frame .image').hide()
-      element.find('.frame .' + selection).show()
+      selected = Bacon.mergeAll(
+        element.find('.original').clickE().map('original'),
+        element.find('.diff').clickE().map('diff'),
+        element.find('.reference').clickE().map('reference'),
+        ).toProperty('original').skipDuplicates()
+
+      selected.onValue (selection) ->
+        element.find('button').removeClass('active')
+        element.find('button.'+selection).addClass('active')
+        element.find('.frame .image').hide()
+        element.find('.frame .' + selection).show()
 
 
   BuildController = (params) ->
@@ -42,23 +70,14 @@ define ['Router', 'text!templates/app.html', 'text!templates/project.html', 'tex
     Bacon.combineAsArray(
         Bacon.$.ajax("/api/project/"+project), 
         Bacon.$.ajax("/api/project/"+project+"/build/"+build),
-        Bacon.$.ajax("/api/project/"+project+"/build/"+build+"/tests")).onValue (resp) ->
-      project = resp[0]
-      build = resp[1]
-      tests = resp[2]
-      element = $(Handlebars.compile(buildTemplate)({project: project, build: build, tests: tests }).trim())
+        Bacon.$.ajax("/api/project/"+project+"/build/"+build+"/tests")).onValues (project, build, tests) ->
+      numOfFailed = _.filter(tests, (test) -> test.status == "fail").length
+      element = $(Handlebars.compile(buildTemplate)({project: project, build: build, tests: tests, numOfFailed: numOfFailed}).trim())
 
-      rows = _.map element.find('.tests .row'), (row) -> $(row)
-      _.each rows, (row) ->
-        id = row.data('id')
-        test = _.find tests, (test) ->
-          test.id == id
+      testRows = _.map tests, (test) ->
+        TestRowController(test)
 
-        visibility = row.clickE().map ()-> !row.hasClass('selected')
-        visibility.toProperty(false).assign(row, 'toggleClass', 'selected')
-
-        TestDetailsController(row, test, visibility)
-
+      element.find('.tests').append(testRows)
 
       $('#content').html(element)
       $("img.lazy").lazyload()

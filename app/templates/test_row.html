@@ -1,0 +1,34 @@
+<div class="row test {{status}}" data-id="{{id}}">
+  <div class="col-md-1">
+    <div class="status {{status}}">
+      <span class="glyphicon"></span>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <h3>
+      {{testName}}
+    </h3>
+    <small>{{created}}</small>
+  </div>
+  <div class="col-md-2"> 
+    <img class="lazy" data-original="/api/project/{{project}}/build/{{buildNumber}}/tests/{{testName}}/original">
+  </div>
+  <div class="col-md-2">
+    <img class="lazy" data-original="/api/project/{{project}}/build/{{buildNumber}}/tests/{{testName}}/diff">
+  </div>
+  <div class="col-md-2"> 
+    <img class="lazy" data-original="/api/project/{{project}}/build/{{buildNumber}}/tests/{{testName}}/reference">
+  </div>
+  <div class="col-md-1 mark-button"> 
+    {{#if showMarkAsOkButton}}
+    <button type="button" class="btn btn-success">
+      <span class="glyphicon glyphicon-thumbs-up"></span> Good
+    </button>
+    {{/if}}
+    {{#if showMarkAsBadButton}}
+    <button type="button" class="btn btn-danger">
+      <span class="glyphicon glyphicon-thumbs-down"></span> Bad
+    </button>
+    {{/if}}
+  </div>
+</div>

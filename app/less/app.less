@@ -7,9 +7,40 @@
 @success-bg: @state-success-bg;
 @success-text: @state-success-text;
 
+.build-status {
+  margin-top: 48px;
+  text-align: center;
+  font-size: @font-size-h2;
+
+  span.status {
+    text-transform: capitalize;
+    &.good, &.success {
+      .label-success;
+    }
+    &.bad, &.fail {
+      .label-danger; 
+    }
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+  span.fails {
+    .label-default;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    background: @gray-light;
+  }
+}
+.row.header {
+  border-bottom: 2px solid #ECECEC;
+  height: 30px;
+  text-align: center;
+  font-size: @font-size-large;
+  color: @gray-light;
+}
 .tests {
   margin-top: 40px;
-  .row {
+ 
+  .row.test {
     clear: both;
     margin-top: 20px;
     &:hover {
@@ -24,9 +55,13 @@
       background:@fail-bg;
     }
 
-    &.success.selected, &.good.selected {
+    &.success.selected {
       border-left: 4px solid @success-text;
       background:@success-bg;
+    }
+
+    &.good.selected {
+      border-left: 4px solid @success-text;
     }
 
     h3 {
@@ -39,8 +74,17 @@
 
     img {
       padding: 10px;
-      max-width: 70px;
+      max-width: 150px;
       max-height: 70px;
+    }
+
+    .mark-button button {
+      margin-top: 17px;
+      span {
+        margin-right: 5px;
+        vertical-align: text-bottom;
+        font-size: @font-size-large;
+      }
     }
   }
 

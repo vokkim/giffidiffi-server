@@ -82,7 +82,7 @@ module.exports = (db) ->
     projectName = request.params.project
     buildNumber = parseInt(request.params.number)
     testName = request.params.test
-    markTestAs(projectName, buildNumber, testName, "bad")
+    markTestAs(projectName, buildNumber, testName, "fail")
 
   markAsGood = (request) ->
     projectName = request.params.project

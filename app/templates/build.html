@@ -1,38 +1,35 @@
 <div>
-  <h1>
-    <small><a href="#!/{{project.name}}/">Project: {{project.displayName}}</a></small><br/>
-    Build #{{build.buildNumber}}
-  </h1>
+  <div class="row">
+    <div class="col-md-6">
+      <h1>
+        <small><a href="#!/{{project.name}}/">Project: {{project.displayName}}</a></small><br/>
+        Build #{{build.buildNumber}}
+      </h1>
+    </div>
+
+    <div class="col-md-6">
+     <div class="build-status">
+      <span class="label status {{build.status}}">{{build.status}}</span><span class="label fails">Failing tests: {{numOfFailed}} / {{tests.length}}</span>
+     </div>
+    </div>
+  </div>
+
 
   <p></p>
-  <div class="tests">
-  {{#unless tests.length}}
+
+  {{#if tests.length}}
+  <div class="row header">
+    <div class="col-md-1"></div>
+    <div class="col-md-4"></div>
+    <div class="col-md-2">Captured</div>
+    <div class="col-md-2">Diff</div>
+    <div class="col-md-2">Reference</div>
+    <div class="col-md-1"></div>
+  </div>
+  {{else}}
     <h2>No tests</h2>
-  {{/unless}}
-  
-  {{#each tests}}
-    <div class="row {{status}}" data-id="{{id}}">
-      <div class="col-md-1">
-        <div class="status {{status}}">
-          <span class="glyphicon"></span>
-        </div>
-      </div>
-      <div class="col-md-5">
-        <h3>
-          {{testName}}
-        </h3>
-        <small>{{created}}</small>
-      </div>
-      <div class="col-md-2"> 
-        <img class="lazy" data-original="/api/project/{{../project.name}}/build/{{../build.buildNumber}}/tests/{{testName}}/original">
-      </div>
-      <div class="col-md-2">
-        <img class="lazy" data-original="/api/project/{{../project.name}}/build/{{../build.buildNumber}}/tests/{{testName}}/diff">
-      </div>
-      <div class="col-md-2"> 
-        <img class="lazy" data-original="/api/project/{{../project.name}}/build/{{../build.buildNumber}}/tests/{{testName}}/reference">
-      </div>
-    </div>
-  {{/each}}
+  {{/if}}
+
+  <div class="tests">
   </div>
 </div>
