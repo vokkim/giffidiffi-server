@@ -51,7 +51,9 @@ module.exports = (db) ->
   runNewTest = (request) ->
     projectName = request.params.project
     buildNumber = parseInt(request.params.number)
-    postData = request.body 
+    postData = request.body
+    if !postData.testName
+      postData = JSON.parse(request.body.data)
     testName = postData.testName
     helpers.getBuild(projectName, buildNumber).flatMap (build) ->
       if _.isEmpty(request.files) || !_.has(request.files, testName) 
