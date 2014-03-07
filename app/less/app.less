@@ -33,6 +33,7 @@
     background: @gray-light;
   }
 }
+
 .row.header {
   border-bottom: 2px solid #ECECEC;
   height: 30px;
@@ -40,10 +41,23 @@
   font-size: @font-size-large;
   color: @gray-light;
 }
-.tests {
+
+.tests, .builds {
   margin-top: 40px;
  
-  .row.test {
+  .row.build {
+    .number, .time, .tests-number {
+      line-height: 70px;
+    }
+    .number {
+      padding-right: 20px;
+      text-align: center;
+      font-size: @font-size-h2;
+      color: @gray-light;
+      font-weight: 800;
+    }
+  }
+  .row.test, .row.build {
     clear: both;
     margin-top: 20px;
     &:hover {
@@ -107,7 +121,6 @@
       margin-top: 10px;
       margin-bottom: 10px;
       max-width: 90%;
-      max-height: 800px;
       position: relative;
       .image {
         min-height: 40px;

@@ -15,12 +15,12 @@ module.exports = (db) ->
       sql = "SELECT * FROM documents WHERE type = 'test' AND id LIKE '" + projectName + "-build-" + buildNumber + "-test-%'"
       Bacon.fromNodeCallback(db, "all", sql).flatMap(helpers.handleResultRows)
 
-  findReferenceImageId = (projectName, testName) ->
+  findReferenceImageId = (projectName, testName, currentBuild) ->
     sql = "SELECT * FROM documents WHERE type = 'test' AND id LIKE '" + projectName + "-build-%-test-" + testName + "'"
     Bacon.fromNodeCallback(db, "all", sql).flatMap(helpers.handleResultRows).map (rows) ->
       rows = _.sortBy(rows, 'buildNumber')
       ok = _.findLast rows, (row) ->
-        row.status == "success"
+        row.status == "success" && row.buildNumber < currentBuild
       if ok
         return ok.images['original']
       else
@@ -51,7 +51,7 @@ module.exports = (db) ->
   runNewTest = (request) ->
     projectName = request.params.project
     buildNumber = parseInt(request.params.number)
-    postData = JSON.parse(request.body.data)
+    postData = request.body 
     testName = postData.testName
     helpers.getBuild(projectName, buildNumber).flatMap (build) ->
       if _.isEmpty(request.files) || !_.has(request.files, testName) 
@@ -60,7 +60,7 @@ module.exports = (db) ->
         return new Bacon.Error {status: 409, result: "Build already complete!"}
 
       originalImageId = generateAttachmentId(projectName, buildNumber, testName, "original")
-      Bacon.combineAsArray(parseUploadedImage(originalImageId, request.files[testName]), findReferenceImageId(projectName, testName)).flatMap (v) ->
+      Bacon.combineAsArray(parseUploadedImage(originalImageId, request.files[testName]), findReferenceImageId(projectName, testName, buildNumber)).flatMap (v) ->
 
         originalImage = v[0]
         referenceImageId = v[1]
@@ -106,7 +106,7 @@ module.exports = (db) ->
   parseUploadedImage = (imageId, fileHandle) ->
     Bacon.combineTemplate {
       id: imageId
-      value: Bacon.fromNodeCallback(fs.readFile, fileHandle.path) 
+      value: Bacon.fromNodeCallback(fs.readFile, fileHandle.path)
       type: fileHandle.type
     }
 

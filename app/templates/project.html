@@ -1,21 +1,15 @@
+<div>
+  <h1>Project: {{displayName}}</h1>
 
-<h1>Project: {{project.displayName}}</h1>
 
-<table class="table">
-  <thead>
-    <tr>
-      <th>Builds</th>
-    </tr>
-  </thead>
-  <tbody>
-    {{#each builds}}
-  
-    <tr>
-      <td><a href="#!/{{../project.name}}/{{buildNumber}}/">{{buildNumber}}</a></td>
-      <td>{{status}}</td>
-      <td>{{start}}</td>
-      <td>{{tests.length}}</td>
-    </tr>
-    {{/each}}
-  </tbody>
-</table>
+  {{#if numOfBuilds}}
+    <div class="row header">
+      
+    </div>
+    {{else}}
+      <h2>No builds</h2>
+    {{/if}}
+
+  <div class="builds">
+  </div>
+</div>

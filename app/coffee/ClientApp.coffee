@@ -1,4 +1,4 @@
-define ['Router', 'text!templates/app.html', 'text!templates/project.html', 'text!templates/build.html', 'text!templates/test_row.html', 'text!templates/test_details.html'], (Router, template, projectTemplate, buildTemplate, testRowTemplate, testDetailsTemplate) ->
+define ['Router', 'text!templates/app.html', 'text!templates/project.html', 'text!templates/build.html', 'text!templates/build_row.html', 'text!templates/test_row.html', 'text!templates/test_details.html'], (Router, template, projectTemplate, buildTemplate, buildRowTemplate, testRowTemplate, testDetailsTemplate) ->
 
   ProjectsController = (params) ->
     Bacon.$.ajax("/api/project").onValue (projects) ->
@@ -6,12 +6,26 @@ define ['Router', 'text!templates/app.html', 'text!templates/project.html', 'tex
       element = Handlebars.compile(template)(context)
       $('#content').html(element)
 
+  BuildRowController = (build) ->
+    context = 
+      numOfBuilds: 'said'
+    element = $(Handlebars.compile(buildRowTemplate)(_.merge(context, build)).trim())
+    element.clickE().onValue () ->
+      window.location = "#!/"+build.project+"/"+build.buildNumber
+
+    element
+
   ProjectController = (params) ->
     project = params.project
-    Bacon.combineAsArray(Bacon.$.ajax("/api/project/"+project), Bacon.$.ajax("/api/project/"+project+"/build")).onValue (resp) ->
-      project = resp[0]
-      builds = resp[1]
-      element = Handlebars.compile(projectTemplate)({project: project, builds: builds})
+    Bacon.combineAsArray(Bacon.$.ajax("/api/project/"+project), Bacon.$.ajax("/api/project/"+project+"/build")).onValues (project, builds) ->
+      context = 
+        numOfBuilds: builds.length
+      element = $(Handlebars.compile(projectTemplate)(_.merge(context, project)))
+
+      sortedBuilds = _.sortBy(builds, (build) -> -build.buildNumber )
+
+      buildElements = _.map(sortedBuilds, BuildRowController)
+      element.find('.builds').append(buildElements)
       $('#content').html(element)
 
   TestRowController = (test) ->
