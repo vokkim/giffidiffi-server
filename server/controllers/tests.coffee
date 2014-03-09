@@ -20,7 +20,7 @@ module.exports = (db) ->
     Bacon.fromNodeCallback(db, "all", sql).flatMap(helpers.handleResultRows).map (rows) ->
       rows = _.sortBy(rows, 'buildNumber')
       ok = _.findLast rows, (row) ->
-        row.status == "success" && row.buildNumber < currentBuild
+        _.contains(["success", "good"], row.status) && row.buildNumber < currentBuild
       if ok
         return ok.images['original']
       else
@@ -66,6 +66,7 @@ module.exports = (db) ->
 
         originalImage = v[0]
         referenceImageId = v[1]
+
         resultS = if referenceImageId then compareImages(originalImage, referenceImageId) else Bacon.once({ result: "success" })
         resultS.flatMap (result) ->
           diffImageId = if result.diffData then generateAttachmentId(projectName, buildNumber, testName, "diff") else null

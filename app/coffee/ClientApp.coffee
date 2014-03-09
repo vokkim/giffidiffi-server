@@ -24,7 +24,7 @@ define ['Router', 'text!templates/app.html', 'text!templates/project.html', 'tex
 
       sortedBuilds = _.sortBy(builds, (build) -> -build.buildNumber )
 
-      buildElements = _.map(sortedBuilds, BuildRowController)
+      buildElements = _.map(sortedBuilds.slice(0, 100), BuildRowController)
       element.find('.builds').append(buildElements)
       $('#content').html(element)
 
@@ -90,9 +90,15 @@ define ['Router', 'text!templates/app.html', 'text!templates/project.html', 'tex
       context = 
         numOfFailed: numOfFailed
         numOfTests: tests.length
+        showBuildCompleteButton: build.status == "created"
         projectDisplayName: project.displayName
       element = $(Handlebars.compile(buildTemplate)(_.merge(context, build)).trim())
 
+      if context.showBuildCompleteButton
+        element.find('.build-complete button').clickE().flatMap () ->
+          Bacon.$.ajaxPost("/api/project/"+build.project+"/build/"+build.buildNumber+"/done")
+        .onValue () ->
+          location.reload()
 
       sortedTests = _.sortBy(tests, ['status', 'testName'])
 
@@ -102,7 +108,7 @@ define ['Router', 'text!templates/app.html', 'text!templates/project.html', 'tex
       element.find('.tests').append(testRows)
 
       $('#content').html(element)
-      $("img.lazy").lazyload()
+      #$("img.lazy").lazyload()
 
 
   router = Router({
@@ -115,3 +121,4 @@ define ['Router', 'text!templates/app.html', 'text!templates/project.html', 'tex
 
   router.onValue (value) ->
     value.controller(value.params)
+    window.scrollTo(0, 0)

@@ -11,15 +11,19 @@ createTempFile = (stream) ->
 
 compareImages = (originalImage, referenceImage) ->
   originalTempFile = createTempFile(originalImage.value)
-  referenceTempFile = createTempFile(referenceImage.value)
-  compareImageFiles(originalTempFile, referenceTempFile).flatMap (result) ->
-    diff = Bacon.fromNodeCallback(fs.readFile, result.diff)
-    diff.onEnd () ->
-      removeTempFiles(originalTempFile, referenceTempFile, result.diff)
-    Bacon.combineTemplate {
-      result: if result.isEqual then "success" else "fail"
-      diffData: diff
-    }
+  if referenceImage && referenceImage.value
+    referenceTempFile = createTempFile(referenceImage.value)
+    return compareImageFiles(originalTempFile, referenceTempFile).flatMap (result) ->
+      diff = Bacon.fromNodeCallback(fs.readFile, result.diff)
+      diff.onEnd () ->
+        removeTempFiles(originalTempFile, referenceTempFile, result.diff)
+      Bacon.combineTemplate {
+        result: if result.isEqual then "success" else "fail"
+        diffData: diff
+      }
+  else
+    console.log "Reference image empty? ", referenceImage
+    return Bacon.once {result: "success"}
 
 removeTempFiles = () ->
   _.forIn arguments, (file) ->

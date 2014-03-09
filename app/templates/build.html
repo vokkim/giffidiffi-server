@@ -6,8 +6,14 @@
         Build #{{buildNumber}}
       </h1>
     </div>
-
-    <div class="col-md-6">
+    <div class="col-md-2">
+     <div class="build-complete">
+      {{#if showBuildCompleteButton}}
+      <button type="button" class="btn btn-primary">Build complete</button>
+      {{/if}}
+     </div>
+    </div>
+    <div class="col-md-4">
      <div class="build-status">
       <span class="label status {{status}}">{{status}}</span><span class="label fails">Failing tests: {{numOfFailed}} / {{numOfTests}}</span>
      </div>
