@@ -34,8 +34,8 @@ compareImageFiles = (fileA, fileB) ->
   # Use Bacon.Bus to hack the gm.compare, Bacon.fromCallback did not seem to work properly for gm?
   bus = new Bacon.Bus()
   opt = 
-    highlightColor: 'yellow'
-    tolerance: 0.002
+    highlightColor: 'darkviolet'
+    tolerance: 0.000001
     file: temp.path({suffix: '.png', prefix: 'giffidiffi-'})
 
   gm.compare fileA, fileB, opt, (err, isEqual, equality, raw) ->
